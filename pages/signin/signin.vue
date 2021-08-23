@@ -55,30 +55,7 @@
 </script>
 
 <style lang="scss">
-	.contents{
-		padding-top: var(--status-bar-height);// 处理app端顶部自定义tabbar被消息栏遮挡问题
-		
-	}
-	.top-bar{
-		width: 100%;
-		height: 88rpx;
-		position: fixed;
-		z-index: 1001;
-		top: 0;
-		left: 0;
-		background: $uni-bg-color;
-		padding-top: var(--status-bar-height);// 处理app端顶部自定义tabbar被消息栏遮挡问题
-		.top-bar-right{
-			float: right;
-			padding-right: 32rpx;
-			.text{
-				font-size: $uni-font-size-lg;
-				font-weight: 500;
-				color: $uni-text-color;
-				line-height: 88rpx;
-			}
-		}
-	}
+	@import  "../../commons/css/mycss.scss";
 	.logo {
 		text-align: center;
 		image{

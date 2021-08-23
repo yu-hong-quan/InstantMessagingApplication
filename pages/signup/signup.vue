@@ -1,7 +1,7 @@
 <template>
 	<view class="contents">
 		<view class="top-bar">
-			<view class="top-bar-left" @click="toSignin">
+			<view class="top-bar-left" @click="backOne">
 				<image src="../../static/images/common/back.png" mode="" class="back-img"></image>
 			</view>
 		</view>
@@ -23,7 +23,7 @@
 					<image src="../../static/images/sign/right1.png" mode="" class="ok" v-show="isemail"></image>
 				</view>
 				<view class="inputs-div">
-					<input type="password" value="" placeholder="请输入密码" placeholder-style="color:#bbb;font-weight:400;" @input="getPsw" class="psw"/>
+					<input :type="type" value="" placeholder="请输入密码" placeholder-style="color:#bbb;font-weight:400;" @input="getPsw" class="psw"/>
 					<image :src="lookurl" mode="" class="look" @click="looks"></image>
 				</view>
 				
@@ -53,7 +53,7 @@
 		},
 		methods:{
 			// 返回至上一页
-			toSignin(){
+			backOne(){
 				uni.navigateBack({data:1})
 			},
 			// 密码显示隐藏方法
@@ -109,37 +109,7 @@
 </script>
 
 <style lang="scss">
-	.contents{
-		padding-top: var(--status-bar-height);// 处理app端顶部自定义tabbar被消息栏遮挡问题
-		
-	}
-	.top-bar{
-		width: 100%;
-		height: 88rpx;
-		position: fixed;
-		z-index: 1001;
-		top: 0;
-		left: 0;
-		background: $uni-bg-color;
-		padding-top: var(--status-bar-height);// 处理app端顶部自定义tabbar被消息栏遮挡问题
-		.top-bar-left{
-			float: left;
-			padding-left: 32rpx;
-			width: 88rpx;
-			height: 88rpx;
-			.text{
-				font-size: $uni-font-size-lg;
-				font-weight: 500;
-				color: $uni-text-color;
-				line-height: 88rpx;
-			}
-			.back-img{
-				width: 26rpx;
-				height: 46rpx;
-				margin-top: 21rpx;
-			}
-		}
-	}
+	@import  "../../commons/css/mycss.scss";
 	.logo {
 		text-align: center;
 		image{

@@ -1,16 +1,20 @@
 <template>
-	<view class="content">
+	<view class="contents">
 		<view class="top-bar">
-			<view class="top-bar-left">
-				<image src="../../static/images/img/four.png" mode=""></image>
-			</view>
 			<view class="top-bar-center">
 				<image src="../../static/images/index/logo.png" mode="" class="logo"></image>
 			</view>
 			<view class="top-bar-right">
-				<view class="search"><image src="../../static/images/index/search.png" mode=""></image></view>
-				<view class="add"><image src="../../static/images/index/add.png" mode=""></image></view>
+				<view class="search" @tap="toSearch">
+					<image src="../../static/images/index/search.png" mode=""></image>
+				</view>
+				<view class="add" @tap="toFriendrequest">
+					<image src="../../static/images/index/add.png" mode=""></image>
+				</view>
 			</view>
+			<navigator class="top-bar-left" url="../userhome/userhome?id=aaa" hover-class="none">
+				<image src="../../static/images/img/four.png" mode=""></image>
+			</navigator>
 		</view>
 		<view class="main">
 			<view class="friends">
@@ -31,7 +35,7 @@
 			<view class="friends">
 				<view class="friend-list" v-for="(item,index) in friends" :key="item.id">
 					<view class="friend-list-l">
-						<text class="tip">{{item.tip}}</text>
+						<text class="tip" v-show="item.tip != 0">{{item.tip}}</text>
 						<image :src="item.imgurl" mode=""></image>
 					</view>
 					<view class="friend-list-r">
@@ -53,132 +57,126 @@
 	export default {
 		data() {
 			return {
-				friends:[]
+				friends: []
 			}
 		},
 		onLoad() {
 			this.getFrinds()
 		},
 		methods: {
-			changeTime(date){
+			// 跳转至搜索页面
+			toSearch(){
+				uni.navigateTo({
+					url:'../search/search'
+				})
+			},
+			// 跳转至好友请求列表页
+			toFriendrequest(){
+				uni.navigateTo({
+					url:'../friendrequest/friendrequest'
+				})
+			},
+			changeTime(date) {
 				return myfun.dateTime(date)
 			},
-			getFrinds(){
+			getFrinds() {
 				this.friends = datas.friends();
-				for(let i=0; i<this.friends.length; i++){
+				for (let i = 0; i < this.friends.length; i++) {
 					this.friends[i].imgurl = '../../static/images/img/' + this.friends[i].imgurl;
 				}
 				console.log(this.friends)
+			},
+			// 使用方法一
+			testRequest1() {
+				this.$minApi.uniapp({
+					wd: 'uni-app'
+				}).then(res => {
+					this.res = res
+					console.log(res)
+				}).catch(err => {
+					console.log(err)
+				})
+			},
+
+			// 使用方式二
+			async testRequest2() {
+				try {
+					const res = await this.$minApi.uniapp({
+						wd: 'uni-app'
+					})
+					console.log(res)
+				} catch (err) {
+					console.log(err)
+				}
 			}
 		}
 	}
 </script>
 
 <style lang="scss">
-	.content{
-		// 处理app端顶部自定义tabbar被消息栏遮挡问题
-		padding-top: var(--status-bar-height);
-		padding-bottom:32rpx;
-	}
+	@import  "../../commons/css/mycss.scss";
 	.top-bar{
-		width: 100%;
-		height: 88rpx;
-		position: fixed;
-		z-index: 1001;
-		top: 0;
-		left: 0;
-		background: $uni-bg-color;
-		border-bottom:1px solid $uni-border-color;
-		padding-top: var(--status-bar-height);// 处理app端顶部自定义tabbar被消息栏遮挡问题
-		.top-bar-left{
-			float: left;
-			padding-left: $uni-spacing-col-base;
-			image{
-				width: 68rpx;
-				height: 68rpx;
-				margin-top: 10rpx;
-				border-radius: 16rpx;
-			}
-		}
-		.top-bar-center{
-			position: absolute;
-			left: 0;
-			right: 0;
-			top: 0;
-			bottom: 0;
-			margin: auto;
-			text-align: center;
-			padding-top: var(--status-bar-height);
-			.logo{
-				padding-top: 19rpx;
-				width: 88rpx;
-				height: 42rpx;
-			}
-		}
-		.top-bar-right{
-			display: flex;
-			float: right;
-			.search,.add{
-				width: 88rpx;
-				height: 88rpx;
-				display: flex;
-				justify-content: center;
-				align-items: center;
-				flex-wrap: nowrap;
-			}
-			image{
-				
-				width: 45rpx;
-				height:45rpx;
-			}
-		}
+		background: rgba(255,255,255,.95);
+		border-bottom: 1px solid $uni-border-color;
 	}
-	.main{
-		padding-top: 104rpx;
+	.main {
+		margin-top: 104rpx;
+		padding-bottom: 32rpx;
 	}
-	.friend-list{
+
+	.friend-list {
 		height: 96rpx;
 		padding: 16rpx $uni-spacing-col-base;
-		&:active{
+
+		&:active {
 			background-color: $uni-bg-color-grey;
 		}
-		.friend-list-l{
+
+		.friend-list-l {
 			float: left;
 			position: relative;
-			image{
+
+			image {
 				width: 96rpx;
 				height: 96rpx;
 				border-radius: $uni-border-radius-base;
 				background-color: $uni-color-primary;
 			}
-			.tip{
+
+			.tip {
 				position: absolute;
-				top: -6rpx;
+				top: -10rpx;
 				left: 68rpx;
-				min-width: 36rpx;
-				max-width: 36rpx;
+				min-width: 20rpx;
+				
 				height: 36rpx;
 				background: $uni-color-warning;
-				border-radius: $uni-border-radius-circle;
-				z-index: 10; 
+				border-radius: 18rpx;
+				padding: 0 8rpx;
+		
+				z-index: 10;
 				font-size: $uni-font-size-sm;
 				color: $uni-text-color-inverse;
 				line-height: 36rpx;
 				text-align: center;
 			}
 		}
-		.friend-list-r{
+
+		.friend-list-r {
 			padding-left: 128rpx;
-			.top{
+
+			.top {
 				height: 50rpx;
-				.name{
+
+				.name {
 					float: left;
 					font-size: 36rpx;
 					font-weight: 400;
 					color: $uni-text-color;
 					line-height: 50rpx;
 				}
-				.time{
+
+				.time {
 					float: right;
 					font-size: $uni-font-size-sm;
 					color: $uni-text-color-disable;
@@ -186,13 +184,14 @@
 				}
 			}
 		}
-		.info{
+
+		.info {
 			font-size: $uni-font-size-base;
 			color: $uni-text-color-grey;
 			line-height: 40rpx;
 			display: -webkit-box;
-			-webkit-box-orient:vertical;
-			-webkit-line-clamp:1;
+			-webkit-box-orient: vertical;
+			-webkit-line-clamp: 1;
 			overflow: hidden;
 		}
 	}
