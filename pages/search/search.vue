@@ -20,8 +20,8 @@
 						<view class="name" v-html="item.name"></view>
 						<view class="email" v-html="item.email"></view>
 					</view>
-					<view class="right-bt send" v-show="item.tip == 1">发消息</view>
-					<view class="right-bt add" v-show="item.tip != 1">加好友</view>
+					<view class="right-bt send" v-show="item.tip == 1" @tap="send">发消息</view>
+					<view class="right-bt add" v-show="item.tip != 1" @tap="addFriend">加好友</view>
 				</view>
 			</view>
 		</view>
@@ -37,6 +37,18 @@
 			};
 		},
 		methods:{
+			// 点击加好友按钮
+			addFriend(){
+				uni.navigateTo({
+					url:'../userhome/userhome'
+				})
+			},
+			// 点击发送消息按钮
+			send(){
+				uni.navigateTo({
+					url:'../chatroom/chatroom'
+				})
+			},
 			search(e){
 				this.userarr = [];
 				let searchval = e.detail.value;

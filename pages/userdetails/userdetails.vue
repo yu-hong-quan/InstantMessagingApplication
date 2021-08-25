@@ -185,7 +185,7 @@
 				return `${year}-${month}-${day}`;
 			},
 			// 图片裁剪
-			 upload() {
+			upload() {
 				uni.chooseImage({
 					count: 1, //默认9
 					sizeType: ['original', 'compressed'], //可以指定是原图还是压缩图，默认二者都有

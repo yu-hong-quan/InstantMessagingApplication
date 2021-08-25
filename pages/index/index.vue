@@ -8,7 +8,7 @@
 				<view class="search" @tap="toSearch">
 					<image src="../../static/images/index/search.png" mode=""></image>
 				</view>
-				<view class="add" @tap="toFriendrequest">
+				<view class="add" @tap="toBuildgroup">
 					<image src="../../static/images/index/add.png" mode=""></image>
 				</view>
 			</view>
@@ -18,7 +18,7 @@
 		</view>
 		<view class="main">
 			<view class="friends">
-				<view class="friend-list">
+				<view class="friend-list" @tap="goGoodFriend">
 					<view class="friend-list-l">
 						<text class="tip">1</text>
 						<image src="../../static/images/index/apply.png" mode=""></image>
@@ -33,7 +33,7 @@
 				</view>
 			</view>
 			<view class="friends">
-				<view class="friend-list" v-for="(item,index) in friends" :key="item.id">
+				<view class="friend-list" v-for="(item,index) in friends" :key="item.id" @tap="goChat">
 					<view class="friend-list-l">
 						<text class="tip" v-show="item.tip != 0">{{item.tip}}</text>
 						<image :src="item.imgurl" mode=""></image>
@@ -76,6 +76,12 @@
 					url:'../friendrequest/friendrequest'
 				})
 			},
+			// 跳转创建群页面
+			toBuildgroup(){
+				uni.navigateTo({
+					url:'../buildgroup/buildgroup'
+				})
+			},
 			changeTime(date) {
 				return myfun.dateTime(date)
 			},
@@ -85,6 +91,18 @@
 					this.friends[i].imgurl = '../../static/images/img/' + this.friends[i].imgurl;
 				}
 				console.log(this.friends)
+			},
+			// 跳转至好友添加列表
+			goGoodFriend(){
+				uni.navigateTo({
+					url:'../friendrequest/friendrequest'
+				})
+			},
+			// 跳转至聊天页
+			goChat(){
+				uni.navigateTo({
+					url:'../chatroom/chatroom'
+				})
 			},
 			// 使用方法一
 			testRequest1() {

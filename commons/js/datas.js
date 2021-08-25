@@ -158,7 +158,85 @@ export default {
 			{
 				id:'a',//用户id
 				imgurl:'two.png',
-				message:'离线SDK下载已迁移到新地址，android 离线SDK下载地址、iOS 离线SDK下载地址。离线SDK下载已迁移到新地址，android 离线SDK下载地址、iOS 离线SDK下载地址。',
+				message:{
+					name:'天安门城楼售票处',
+					address:'东长安街天安门城楼内',
+					latitude:'39.909473',
+					longitude:'116.39730899999999',
+				},
+				type:3, //内容类型（0文字，1图片链接，2音频链接...）
+				time:new Date(),//发送时间
+				tip:15,
+			},
+			{
+				id:'b',//用户id
+				imgurl:'one.png',
+				message:{
+					name:'雁门关雁门关雁门关雁门关雁门关',
+					address:'东长安街天安门城楼内,东长安街天安门城楼内,东长安街天安门城楼内',
+					latitude:'39.909473',
+					longitude:'116.39730899999999',
+				},
+				type:3, //内容类型（0文字，1图片链接，2音频链接...）
+				time:new Date(),//发送时间
+				tip:16,
+			},
+			{
+				id:'a',//用户id
+				imgurl:'two.png',
+				message:{
+					name:'天安门城楼售票处',
+					address:'东长安街天安门城楼内',
+					latitude:'39.909473',
+					longitude:'116.39730899999999',
+				},
+				type:3, //内容类型（0文字，1图片链接，2音频链接...）
+				time:new Date(),//发送时间
+				tip:17,
+			},
+			{
+				id:'b',//用户id
+				imgurl:'one.png',
+				message:{
+					name:'雁门关雁门关雁门关雁门关雁门关',
+					address:'东长安街天安门城楼内,东长安街天安门城楼内,东长安街天安门城楼内',
+					latitude:'39.909473',
+					longitude:'116.39730899999999',
+				},
+				type:3, //内容类型（0文字，1图片链接，2音频链接...）
+				time:new Date(),//发送时间
+				tip:18,
+			},
+			{
+				id:'a',//用户id
+				imgurl:'two.png',
+				message:{
+					name:'天安门城楼售票处',
+					address:'东长安街天安门城楼内',
+					latitude:'39.909473',
+					longitude:'116.39730899999999',
+				},
+				type:3, //内容类型（0文字，1图片链接，2音频链接...）
+				time:new Date(),//发送时间
+				tip:19,
+			},
+			{
+				id:'b',//用户id
+				imgurl:'one.png',
+				message:{
+					name:'雁门关雁门关雁门关雁门关雁门关',
+					address:'东长安街天安门城楼内,东长安街天安门城楼内,东长安街天安门城楼内',
+					latitude:'39.909473',
+					longitude:'116.39730899999999',
+				},
+				type:3, //内容类型（0文字，1图片链接，2音频链接...）
+				time:new Date(),//发送时间
+				tip:20,
+			},
+			{
+				id:'a',//用户id
+				imgurl:'two.png',
+				message:'iOS 离线SDK下载地址。',
 				type:0, //内容类型（0文字，1图片链接，2音频链接...）
 				time:new Date()-1000,//发送时间
 				tip:1,
@@ -166,22 +244,22 @@ export default {
 			{
 				id:'b',//用户id
 				imgurl:'one.png',
-				message:'yi.png',
+				message:'yi.jpg',
 				type:1, //内容类型（0文字，1图片链接，2音频链接...）
 				time:new Date()-1000*16,//发送时间
 				tip:2,
 			},
 			{
 				id:'a',//用户id
-				imgurl:'four.png',
-				message:'er.png',
+				imgurl:'two.png',
+				message:'one.png',
 				type:1, //内容类型（0文字，1图片链接，2音频链接...）
 				time:new Date()-1000*60,//发送时间
 				tip:3,
 			},
 			{
 				id:'b',//用户id
-				imgurl:'wu.png',
+				imgurl:'one.png',
 				message:'离线SDK下载已迁移到新地址，android 离线SDK下载地址、iOS 离线SDK下载地址。',
 				type:0, //内容类型（0文字，1图片链接，2音频链接...）
 				time:new Date()-1000*60*36,//发送时间
@@ -189,7 +267,7 @@ export default {
 			},
 			{
 				id:'a',//用户id
-				imgurl:'er.png',
+				imgurl:'two.png',
 				message:'离线SDK下载已迁移到新地址，android 离线SDK下载地址、iOS 离线SDK下载地址。离线SDK下载已迁移到新地址，android 离线SDK下载地址、iOS 离线SDK下载地址。',
 				type:0, //内容类型（0文字，1图片链接，2音频链接...）
 				time:new Date()-1000*60*40,//发送时间
@@ -197,7 +275,7 @@ export default {
 			},
 			{
 				id:'b',//用户id
-				imgurl:'yi.png',
+				imgurl:'one.png',
 				message:'离线SDK下载已迁移到新地址，android 离线SDK下载地址、iOS 离线SDK下载地址。',
 				type:0, //内容类型（0文字，1图片链接，2音频链接...）
 				time:new Date()-1000*60*57,//发送时间
@@ -214,8 +292,8 @@ export default {
 			{
 				id:'b',//用户id
 				imgurl:'one.png',
-				message:'离线SDK下载已迁移到新地址，android 离线SDK下载地址、iOS 离线SDK下载地址。',
-				type:0, //内容类型（0文字，1图片链接，2音频链接...）
+				message:'wu.jpg',
+				type:1, //内容类型（0文字，1图片链接，2音频链接...）
 				time:new Date()-1000*60*60*50,//发送时间
 				tip:8,
 			},
@@ -250,6 +328,28 @@ export default {
 				type:0, //内容类型（0文字，1图片链接，2音频链接...）
 				time:new Date()-1000*60*60*241,//发送时间
 				tip:12,
+			},
+			{
+				id:'a',//用户id
+				imgurl:'one.png',
+				message:{
+					voice:'a',
+					time:60,
+				},
+				type:2, //内容类型（0文字，1图片链接，2音频链接...）
+				time:new Date(),//发送时间
+				tip:13,
+			},
+			{
+				id:'b',//用户id
+				imgurl:'two.png',
+				message:{
+					voice:'a',
+					time:2,
+				},
+				type:2, //内容类型（0文字，1图片链接，2音频链接...）
+				time:new Date(),//发送时间
+				tip:14,
 			},
 		]
 		return msgs;

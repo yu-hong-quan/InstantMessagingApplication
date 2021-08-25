@@ -17,48 +17,110 @@
 		</view>
 		
 		<!-- 主体聊天内容栏 -->
-		<scroll-view class="chat" scroll-y="true" scroll-with-animation="true">
-			<view class="chat-main">
-				<view class="chat-ls" v-for="(item,index) in msgs" :key="index">
+		<scroll-view class="chat" scroll-y="true" :scroll-with-animation="swanition" :scroll-into-view="scrollToView" :scroll-top="scrollTop" @scrolltoupper="nextPage">
+			<view class="chat-main" :style="{paddingBottom:inputh + 'px'}">
+				<view class="loading" :class="{displaynone:isloading}">
+					<image src="../../static/images/common/loading.png" mode="" class="loading-img" :animation="animationData"></image>
+				</view>
+				<view class="chat-ls" v-for="(item,index) in msgs" :key="index" :id="`msg${item.tip}`">
 					<!-- 消息时间 -->
-					<view class="chat-time">{{changeTime(item.time)}}</view>
+					<view class="chat-time" v-if="item.time != ''">{{changeTime(item.time)}}</view>
 					<!-- 消息内容-左边 -->
 					<view class="msg-m msg-left" v-if="item.id != 'b'">
 						<!-- 用户头像 -->
 						<image :src="item.imgurl" mode="" class="user-img"></image>
 						<!-- 发送的消息 -->
-						<view class="message">
 							<!-- 文字类型的消息 -->
-							<view class="msg-text">{{item.message}}</view>
-						</view>
+							<view class="message" v-if="item.type == 0">
+								<view class="msg-text">{{item.message}}</view>
+							</view>
+							<!-- 图片类型的消息 -->
+							<view class="message" v-if="item.type == 1">
+								<image :src="item.message" class="msg-img" mode="widthFix" @tap="perviewImg(item.message)"></image>
+							</view>
+							<!-- 音频类型的消息 -->
+							<view class="message" v-if="item.type == 2">
+								<view class="msg-text voice" @tap="playVoice(item.message.voice)" :style="{width:item.message.time*4 + 'px'}">
+									<image src="../../static/images/chatroom/yy.png" mode="" class="voice-img"></image>
+									{{item.message.time + '″'}}
+								</view>
+							</view>
+							<!-- 定位位置类型的消息 -->
+							<view class="message" v-if="item.type == 3">
+								<view class="msg-map" @tap="openLocation(item.message)">
+									<view class="map-name">{{item.message.name}}</view>
+									<view class="map-address">{{item.message.address}}</view>
+									<image src="../../static/images/chatroom/map.png" mode="aspectFit" class="map-msg"></image>
+									<!-- <map :latitude="item.message.latitude" :longitude="item.message.longitude" :markers="covers(item.message)" class="map"></map> -->
+								</view>
+							</view>
 					</view>
 					<!-- 消息内容-右边 -->
 					<view class="msg-m msg-right" v-if="item.id == 'b'">
 						<!-- 用户头像 -->
-						<image src="../../static/images/img/four.png" mode="" class="user-img"></image>
+						<image :src="item.imgurl" mode="" class="user-img"></image>
 						<!-- 发送的消息 -->
-						<view class="message">
 							<!-- 文字类型的消息 -->
-							<view class="msg-text">您好啊，我的朋友。您好啊，我的朋友。您好啊，我的朋友。您好啊，我的朋友。您好啊，我的朋友。</view>
-						</view>
+							<view class="message" v-if="item.type == 0">
+								<view class="msg-text">{{item.message}}</view>
+							</view>
+							<!-- 图片类型的消息 -->
+							<view class="message" v-if="item.type == 1">
+								<image :src="item.message" class="msg-img" mode="widthFix" @tap="perviewImg(item.message)"></image>
+							</view>
+							<!-- 音频类型的消息 -->
+							<view class="message" v-if="item.type == 2">
+								<view class="msg-text voice" @tap="playVoice(item.message.voice)" :style="{width:item.message.time*4 + 'px'}">
+									{{item.message.time + '″'}}
+									<image src="../../static/images/chatroom/yy.png" mode="" class="voice-img"></image>
+								</view>
+							</view>
+							<!-- 定位位置类型的消息 -->
+							<view class="message" v-if="item.type == 3">
+								<view class="msg-map" @tap="openLocation(item.message)">
+									<view class="map-name">{{item.message.name}}</view>
+									<view class="map-address">{{item.message.address}}</view>
+									<image src="../../static/images/chatroom/map.png" mode="aspectFit" class="map-msg"></image>
+									<!-- <map :latitude="item.message.latitude" :longitude="item.message.longitude" :markers="covers(item.message)" class="map"></map> -->
+								</view>
+							</view>
 					</view>
 				</view>
 			</view>
+			<!-- <view class="padbt"></view> -->
 		</scroll-view>
+		<submit @inputs="inputs" @heights="heights"></submit>
 	</view>
 </template>
 
 <script>
 	import datas from '../../commons/js/datas.js';
 	import myfun from '../../commons/js/myfun.js';
+	import submit from '../../components/submit/submit.vue';
+	const innerAudioContext = uni.createInnerAudioContext();
 	export default {
 		data() {
 			return {
 				msgs:[],
+				imgMsg:[],
+				oldTime:new Date(),
+				scrollToView:'',
+				inputh:'90',//信息窗高度
+				scrollTop:'',
+				animationData: {},
+				nowpage:0,//页码
+				loadingTime:null,
+				isloading:true,
+				swanition:true,
+				beginloading:true,
 			};
 		},
+		components:{
+			submit
+		},
 		onLoad() {
-			this.getMsg()
+			this.getMsg(this.nowpage)
+			// this.nextPage()
 		},
 		methods:{
 			// 返回至上一页
@@ -67,23 +129,179 @@
 					data: 1
 				})
 			},
+			// 获取元素高度
+			getElementHeight(){
+				const query = uni.createSelectorQuery().in(this);
+				query.select('.chat-main').boundingClientRect(data => {
+					this.scrollTop = data.height;
+				}).exec();
+			},
 			// 处理时间
 			changeTime(date) {
-				return myfun.dateTime(date)
+				return myfun.messageTime(date)
 			},
 			// 获取聊天数据
-			getMsg(){
+			getMsg(page){
 				let msg = datas.message();
-				for(let i=0; i<msg.length; i++){
+				let maxpages = msg.length;
+				if(msg.length > (page+1)*10){
+					maxpages = (page+1)*10;
+					// 页数加1
+					this.nowpage ++;
+				}else{
+					// 数据已经全部获取完毕
+					this.nowpage = -1;
+				}
+				for(var i=page*10; i<maxpages; i++){
 					msg[i].imgurl = `../../static/images/img/${msg[i].imgurl}`;
+					// 时间间隔
+					if(i<msg.length-1){
+						let t = myfun.spacTime(this.oldTime,msg[i].time);		
+						if(t){
+							this.oldTime = t;
+						}
+						msg[i].time = t;
+					}
 					if(msg[i].type == 1){
 						msg[i].message = `../../static/images/img/${msg[i].message}`;
+						this.imgMsg.unshift(msg[i].message);
 					}
 					// 倒序插入
 					this.msgs.unshift(msg[i])
 				}
-				console.log(this.msgs);
-			}
+				
+				this.$nextTick(function(){
+					this.swanition = false;
+					// 值应为某子元素id（id不能以数字开头）。设置哪个方向可滚动，则在哪个方向滚动到该元素
+					this.scrollToView = `msg${this.msgs[maxpages-page*10-1].tip}`;
+				})
+				clearInterval(this.loadingTime);
+				// 关闭loading图标
+				this.isloading = true;
+				// 恢复加载控制
+				this.beginloading = true;
+			},
+			// 预览图片
+			perviewImg(e){
+				let index = 0;
+				for(let i=0; i<this.imgMsg.length; i++){
+					if(this.imgMsg[i] == e){
+						index = i;
+					}
+				}
+				// 预览图片
+				uni.previewImage({
+					urls: this.imgMsg,
+					current:index,
+					longPressActions: {
+						itemList: ['发送给朋友', '保存图片', '收藏'],
+						success: function(data) {
+							console.log('选中了第' + (data.tapIndex + 1) + '个按钮,第' + (data.index + 1) + '张图片');
+						},
+						fail: function(err) {
+							console.log(err.errMsg);
+						}
+					}
+				});
+			},
+			// 音频播放
+			playVoice(e){
+				innerAudioContext.src = e;
+				innerAudioContext.play();
+			},
+			// 地图定位
+			covers(e){
+				let map = [
+					{
+						latitude:e.latitude,
+						longitude:e.longitude,
+						iconPath:'../../static/images/chatroom/dw.png'
+					}
+				]
+				return map;
+			},
+			// 打开导航
+			openLocation(e){
+				console.log(e)
+				uni.openLocation({
+				    latitude: e.latitude,
+				    longitude: e.longitude,
+					name:e.name,
+					address:e.address,
+				    success: function () {
+				        console.log('success');
+				    }
+				});
+			},
+			// 接收输入的内容
+			inputs(e){
+				console.log(e)
+				this.swanition = true;
+				let len = this.msgs.length;
+				let nowTime = new Date();
+				// 时间间隔
+				let t = myfun.spacTime(this.oldTime,nowTime);		
+				if(t){
+					this.oldTime = t;
+				}
+				nowTime = t;
+				let data = {
+						id:'b',//用户id
+						imgurl:'../../static/images/img/one.png',
+						message:e.message,
+						type:e.types, //内容类型（0文字，1图片链接，2音频链接...）
+						time:nowTime,//发送时间
+						tip:len,
+					}
+				console.log(data)
+				this.msgs.push(data)
+				this.$nextTick(function(){
+					this.getElementHeight()
+				})
+				if(e.types == 1){
+					this.imgMsg.push(e.message);
+				}
+			},
+			//接收输入框元素的高度
+			heights(e){
+				console.log(e)
+				this.inputh = e;
+				this.$nextTick(function(){
+					this.getElementHeight()
+				})
+			},
+			// 滚动到底部
+			goBottom(){
+				this.swanition = true;
+				this.scrollToView = '';
+				this.$nextTick(function(){
+					let len = this.msgs.length-1;
+					this.scrollToView = `msg${this.msgs[len].tip}`;
+				})
+			},
+			// 滚动顶部加载下一页
+			 nextPage(){
+				if(this.nowpage > 0 && this.beginloading){
+					// 出现loading图标
+					this.isloading = false;
+					// 禁止重复加载
+					this.beginloading = false;
+					var animation = uni.createAnimation({
+					  duration: 1000,
+					    timingFunction: 'step-start',
+					})
+					this.animation = animation
+					let i = 1;
+					this.loadingTime = setInterval(function() {
+					  animation.rotate(i*30).step()
+					  this.animationData = animation.export()
+					  i++;
+					  if(i>40){
+						this.getMsg(this.nowpage);
+					  }
+					}.bind(this), 100)
+				}
+			},
 		}
 	}
 </script>
@@ -113,13 +331,27 @@
 			}
 		}
 	}
+	.displaynone{
+		display: none;
+	}
 	.chat{
 		height: 100%;
+		.padbt{
+			height:  env(safe-area-inset-bottom);
+			width: 100%;
+		}
+		.loading{
+			text-align: center;
+			.loading-img{
+				width: 60rpx;
+				height: 60rpx;
+			}
+		}
 		.chat-main{
 			padding-left: $uni-spacing-col-base;
 			padding-right: $uni-spacing-col-base;
 			padding-top: 100rpx;
-			padding-bottom: 120rpx;
+			// padding-bottom: 120rpx;
 			display: flex;
 			flex-direction: column;
 		}
@@ -142,15 +374,67 @@
 				}
 				.message{
 					max-width: 480rpx;
-					flex: auto;
+					flex: none;
 				}
 				.msg-text{
 					font-size: $uni-font-size-lg;
 					padding: 18rpx 24rpx;
 					line-height: 44rpx;
 					color: $uni-text-color;
+					max-width: 480rpx;
+					/*这两行代码可以解决大部分场景下的换行问题*/
+					word-break: break-all;
+					word-wrap: break-word;
+					/*但在有些场景中，还需要加上下面这行代码*/
+					white-space: normal;
 				}
-				
+				.msg-img{
+					max-width: 400rpx;
+					border-radius: $uni-border-radius-base;
+				}
+				.msg-map{
+					background: #fff;
+					width: 464rpx;
+					height: 284rpx;
+					overflow: hidden;
+					.map-name{
+						font-size: $uni-font-size-lg;
+						line-height: 44rpx;
+						color: $uni-text-color;
+						padding: 18rpx 24rpx 0 24rpx;
+						display: -webkit-box;
+						-webkit-box-orient:vertical;
+						-webkit-line-clamp:1;
+						overflow: hidden;
+					}
+					.map-address{
+						font-size: $uni-font-size-sm;
+						color: $uni-text-color-disable;
+						padding: 0rpx 24rpx;
+						display: -webkit-box;
+						-webkit-box-orient:vertical;
+						-webkit-line-clamp:1;
+						overflow: hidden;
+					}
+					.map{
+						padding-top: 8rpx;
+						width: 464rpx;
+						height: 190rpx;
+					}
+					.map-msg{
+						padding-top: 8rpx;
+						width: 480rpx;
+						height: 190rpx;
+					}
+				}
+				.voice{
+					min-width: 80rpx;
+					max-width: 400rpx;
+				}
+				.voice-img{
+					width: 28rpx;
+					height: 36rpx;
+				}
 			}
 			.msg-left{
 				flex-direction: row;
@@ -159,13 +443,47 @@
 					background-color:#fff;
 					border-radius: 0px 20rpx 20rpx 20rpx;
 				}
+				.msg-img{
+					margin-left: 16rpx;
+				}
+				.msg-map{
+					margin-left: 16rpx;
+					background-color:#fff;
+					border-radius: 0px 20rpx 20rpx 20rpx;
+				}
+				.voice{
+					text-align: right;
+				}
+				.voice-img{
+					float: left;
+					transform: rotate(180deg);
+					padding-bottom: 4rpx;
+				}
 			}
 			.msg-right{
 				flex-direction: row-reverse;
 				.msg-text{
 					margin-right: 16rpx;
-					background-color:#fff260;
+					background-color:#9EEA6A;
 					border-radius: 20rpx 0rpx 20rpx 20rpx;
+				}
+				.message{
+					display: flex;
+					justify-content: flex-end;
+					.msg-img{
+						margin-right: 16rpx;
+					}
+					.msg-map{
+						margin-right: 16rpx;
+						border-radius: 20rpx 0rpx 20rpx 20rpx;
+					}
+					.voice{
+						text-align: left;
+					}
+					.voice-img{
+						float: right;
+						padding-top: 4rpx;
+					}
 				}
 			}
 		}

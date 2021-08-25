@@ -42,6 +42,7 @@
 		margin: auto;
 		text-align: center;
 		padding-top: var(--status-bar-height);
+		z-index: -1;
 		.logo {
 			padding-top: 19rpx;
 			width: 88rpx;
@@ -100,7 +101,7 @@
 	width: 100%;
 	height: 90rpx;
 	padding-top: 10rpx;
-	padding-bottom: var(--status-bar-height);
+	padding-bottom:env(safe-area-inset-bottom);
 	
 }
 // btn1样式
