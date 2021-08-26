@@ -9,6 +9,7 @@ export default {
 				name:'大海',
 				time:new Date(),
 				news:'文件（Object）上传至存储空间（Bucket）后，OSS会自动生成文件URL，您可以直接通过文件URL',
+				type:0,//0为好友，1为群
 			},
 			{
 				id:2,
@@ -18,6 +19,7 @@ export default {
 				name:'山川',
 				time:new Date(),
 				news:'文件（Object）上传至存储空间（Bucket）后，OSS会自动生成文件URL，您可以直接通过文件URL',
+				type:1,//0为好友，1为群
 			},
 			{
 				id:4,
@@ -27,6 +29,7 @@ export default {
 				name:'河流',
 				time:new Date(),
 				news:'文件（Object）上传至存储空间（Bucket）后',
+				type:1,//0为好友，1为群
 			},
 			{
 				id:3,
@@ -36,6 +39,7 @@ export default {
 				name:'天空',
 				time:new Date(),
 				news:'OSS会自动生成文件URL，您可以直接通过文件URL',
+				type:0,//0为好友，1为群
 			},
 			{
 				id:5,
@@ -45,6 +49,7 @@ export default {
 				name:'太空',
 				time:new Date(),
 				news:'海大海大海大海大海大海大海大海大海大海大海大海大海大海大海大海',
+				type:0,//0为好友，1为群
 			},
 			{
 				id:6,
@@ -54,6 +59,7 @@ export default {
 				name:'大海',
 				time:new Date(),
 				news:'（即Bucket外网访问域名）访问该文件。若您希望通过自定义域名（自有域名）访问这些文件，需要将自定义域名绑定至文件所在的Bucket。',
+				type:0,//0为好友，1为群
 			},
 			{
 				id:7,
@@ -63,6 +69,7 @@ export default {
 				name:'大海',
 				time:new Date(),
 				news:'文件（Object）上传至存储空间（Bucket）后，OSS会自动生成文件URL，您可以直接通过文件URL（即Bucket外网访问域名）访问该文件。若您希望通过自定义域名（自有域名）访问这些文件，需要将自定义域名绑定至文件所在的Bucket。',
+				type:0,//0为好友，1为群
 			},
 			{
 				id:8,
@@ -81,6 +88,7 @@ export default {
 				name:'山川',
 				time:new Date(),
 				news:'文件（Object）上传至存储空间（Bucket）后，OSS会自动生成文件URL，您可以直接通过文件URL',
+				type:1,//0为好友，1为群
 			},
 			{
 				id:10,
@@ -90,6 +98,7 @@ export default {
 				name:'河流',
 				time:new Date(),
 				news:'文件（Object）上传至存储空间（Bucket）后',
+				type:0,//0为好友，1为群
 			},
 			{
 				id:11,
@@ -99,6 +108,7 @@ export default {
 				name:'天空',
 				time:new Date(),
 				news:'OSS会自动生成文件URL，您可以直接通过文件URL',
+				type:1,//0为好友，1为群
 			},
 			{
 				id:12,
@@ -108,6 +118,7 @@ export default {
 				name:'太空',
 				time:new Date(),
 				news:'海大海大海大海大海大海大海大海大海大海大海大海大海大海大海大海',
+				type:1,//0为好友，1为群
 			},
 			{
 				id:13,
@@ -117,6 +128,7 @@ export default {
 				name:'大海',
 				time:new Date(),
 				news:'（即Bucket外网访问域名）访问该文件。若您希望通过自定义域名（自有域名）访问这些文件，需要将自定义域名绑定至文件所在的Bucket。',
+				type:1,//0为好友，1为群
 			},
 			{
 				id:14,
@@ -126,6 +138,7 @@ export default {
 				name:'大海',
 				time:new Date(),
 				news:'文件（Object）上传至存储空间（Bucket）后，OSS会自动生成文件URL，您可以直接通过文件URL（即Bucket外网访问域名）访问该文件。若您希望通过自定义域名（自有域名）访问这些文件，需要将自定义域名绑定至文件所在的Bucket。',
+				type:1,//0为好友，1为群
 			},
 		];
 		return friendarr;

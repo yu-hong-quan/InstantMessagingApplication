@@ -33,7 +33,7 @@
 				</view>
 			</view>
 			<view class="friends">
-				<view class="friend-list" v-for="(item,index) in friends" :key="item.id" @tap="goChat">
+				<view class="friend-list" v-for="(item,index) in friends" :key="item.id" @tap="goChat(item)">
 					<view class="friend-list-l">
 						<text class="tip" v-show="item.tip != 0">{{item.tip}}</text>
 						<image :src="item.imgurl" mode=""></image>
@@ -99,9 +99,10 @@
 				})
 			},
 			// 跳转至聊天页
-			goChat(){
+			goChat(e){
+				console.log(e)
 				uni.navigateTo({
-					url:'../chatroom/chatroom'
+					url:'../chatroom/chatroom?fid=' + e.id + '&fimgUrl=' + e.imgurl + '&type='+e.type + '&title=' + e.name
 				})
 			},
 			// 使用方法一

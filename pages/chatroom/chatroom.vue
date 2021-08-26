@@ -3,15 +3,15 @@
 		<!-- 顶部标题栏 -->
 		<view class="top-bar">
 			<view class="top-bar-center">
-				<view class="text">头文字D</view>
+				<view class="text">{{title}}</view>
 			</view>
 			<view class="top-bar-left" @click="backOne">
 				<image src="../../static/images/common/back.png" mode="" class="back-img"></image>
 			</view>
 			<view class="top-bar-right">
 				<view class="pice"></view>
-				<view class="group-img">
-					<image src="../../static/images/img/two.png" mode=""></image>
+				<view class="group-img" @tap="goGroupHome" v-show="type == 1">
+					<image :src="fimgUrl" mode=""></image>
 				</view>
 			</view>
 		</view>
@@ -113,12 +113,21 @@
 				isloading:true,
 				swanition:true,
 				beginloading:true,
+				fimgUrl:'../../static/images/img/two.png',
+				fid:'a',
+				type:'1',//0为好友，1为群
+				title:''
 			};
 		},
 		components:{
 			submit
 		},
-		onLoad() {
+		onLoad(e) {
+			console.log(e)
+			this.type = e.type;
+			this.fid = e.fid;
+			this.fimgUrl = e.fimgUrl;
+			this.title = e.title;
 			this.getMsg(this.nowpage)
 			// this.nextPage()
 		},
@@ -139,6 +148,12 @@
 			// 处理时间
 			changeTime(date) {
 				return myfun.messageTime(date)
+			},
+			// 进入群详情
+			goGroupHome(){
+				uni.navigateTo({
+					url:'../grouphome/grouphome?gid='+this.fid + '&gimg=' + this.fimgUrl
+				})
 			},
 			// 获取聊天数据
 			getMsg(page){

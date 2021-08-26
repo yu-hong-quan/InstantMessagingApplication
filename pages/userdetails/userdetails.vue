@@ -90,7 +90,8 @@
 					</view>
 				</view>
 			</view>
-			<view class="bt2">退出登录</view>
+			<view class="bt2" v-if="uid == id" @tap="quit">退出登录</view>
+			<view class="bt2" v-if="uid != id" @tap="deleteFriend">删除好友</view>
 		</view>
 		<view class="modify" :animation="animationData" :style="{bottom:-+widHeight + 'px'}">
 			<view class="modify-header">
@@ -136,6 +137,8 @@
 				isModfiy:false,//动画开关
 				widHeight:'',
 				ispwd:false,
+				uid:'1',
+				id:'1',
 			};
 		},
 		components:{ImageCropper},

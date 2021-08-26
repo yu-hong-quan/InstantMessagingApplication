@@ -70,6 +70,14 @@
             }
             
         }
+        ,{
+            "path" : "pages/grouphome/grouphome",
+            "style" :                                                                                    
+            {
+                "navigationStyle":"custom"
+            }
+            
+        }
     ],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",
