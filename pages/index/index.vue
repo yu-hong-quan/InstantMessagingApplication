@@ -1,20 +1,22 @@
 <template>
 	<view class="contents">
 		<view class="top-bar">
-			<view class="top-bar-center">
-				<image src="../../static/images/index/logo.png" mode="" class="logo"></image>
-			</view>
-			<view class="top-bar-right">
-				<view class="search" @tap="toSearch">
-					<image src="../../static/images/index/search.png" mode=""></image>
+			<view class="top-bar-contaner">
+				<view class="top-bar-center">
+					<image src="../../static/images/index/logo.png" mode="" class="logo"></image>
 				</view>
-				<view class="add" @tap="toBuildgroup">
-					<image src="../../static/images/index/add.png" mode=""></image>
+				<view class="top-bar-right">
+					<view class="search" @tap="toSearch">
+						<image src="../../static/images/index/search.png" mode=""></image>
+					</view>
+					<view class="add" @tap="toBuildgroup">
+						<image src="../../static/images/index/add.png" mode=""></image>
+					</view>
 				</view>
+				<navigator class="top-bar-left" url="../userhome/userhome?id=aaa" hover-class="none">
+					<image src="../../static/images/img/four.png" mode=""></image>
+				</navigator>
 			</view>
-			<navigator class="top-bar-left" url="../userhome/userhome?id=aaa" hover-class="none">
-				<image src="../../static/images/img/four.png" mode=""></image>
-			</navigator>
 		</view>
 		<view class="main">
 			<view class="friends">
@@ -65,21 +67,21 @@
 		},
 		methods: {
 			// 跳转至搜索页面
-			toSearch(){
+			toSearch() {
 				uni.navigateTo({
-					url:'../search/search'
+					url: '../search/search'
 				})
 			},
 			// 跳转至好友请求列表页
-			toFriendrequest(){
+			toFriendrequest() {
 				uni.navigateTo({
-					url:'../friendrequest/friendrequest'
+					url: '../friendrequest/friendrequest'
 				})
 			},
 			// 跳转创建群页面
-			toBuildgroup(){
+			toBuildgroup() {
 				uni.navigateTo({
-					url:'../buildgroup/buildgroup'
+					url: '../buildgroup/buildgroup'
 				})
 			},
 			changeTime(date) {
@@ -93,19 +95,20 @@
 				console.log(this.friends)
 			},
 			// 跳转至好友添加列表
-			goGoodFriend(){
+			goGoodFriend() {
 				uni.navigateTo({
-					url:'../friendrequest/friendrequest'
+					url: '../friendrequest/friendrequest'
 				})
 			},
 			// 跳转至聊天页
-			goChat(e){
+			goChat(e) {
 				console.log(e)
 				uni.navigateTo({
-					url:'../chatroom/chatroom?fid=' + e.id + '&fimgUrl=' + e.imgurl + '&type='+e.type + '&title=' + e.name
+					url: '../chatroom/chatroom?fid=' + e.id + '&fimgUrl=' + e.imgurl + '&type=' + e.type +
+						'&title=' + e.name
 				})
 			},
-			// 使用方法一
+			// 封装请求使用方法一
 			testRequest1() {
 				this.$minApi.uniapp({
 					wd: 'uni-app'
@@ -117,7 +120,7 @@
 				})
 			},
 
-			// 使用方式二
+			// 封装请求使用方式二
 			async testRequest2() {
 				try {
 					const res = await this.$minApi.uniapp({
@@ -127,17 +130,22 @@
 				} catch (err) {
 					console.log(err)
 				}
-			}
+			},
+			
+			// 监听返回键
+			// onBackPress
 		}
 	}
 </script>
 
 <style lang="scss">
-	@import  "../../commons/css/mycss.scss";
-	.top-bar{
-		background: rgba(255,255,255,.95);
+	@import "../../commons/css/mycss.scss";
+
+	.top-bar {
+		background: rgba(255, 255, 255, .95);
 		border-bottom: 1px solid $uni-border-color;
 	}
+
 	.main {
 		margin-top: 104rpx;
 		padding-bottom: 32rpx;
@@ -167,12 +175,12 @@
 				top: -10rpx;
 				left: 68rpx;
 				min-width: 20rpx;
-				
+
 				height: 36rpx;
 				background: $uni-color-warning;
 				border-radius: 18rpx;
 				padding: 0 8rpx;
-		
+
 				z-index: 10;
 				font-size: $uni-font-size-sm;
 				color: $uni-text-color-inverse;

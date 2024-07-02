@@ -1,14 +1,17 @@
 <template>
 	<view class="content">
 		<view class="top-bar">
-			<view class="top-bar-left" @click="backOne">
-				<image src="../../static/images/common/back.png" mode="" class="back-img"></image>
-			</view>
-			<view class="top-bar-right" @click="goUserDetails">
-				<view class="more-img">
-					<image src="../../static/images/group/more.png" mode=""></image>
+			<view class="top-bar-contaner">
+				<view class="top-bar-left" @click="backOne">
+					<image src="../../static/images/common/back.png" mode="" class="back-img"></image>
+				</view>
+				<view class="top-bar-right" @click="goUserDetails">
+					<view class="more-img">
+						<image src="../../static/images/group/more.png" mode=""></image>
+					</view>
 				</view>
 			</view>
+			
 		</view>
 		<view class="bg">
 			<view class="bg-bai" :animation="animationData5"></view>

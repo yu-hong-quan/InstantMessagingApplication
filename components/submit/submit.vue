@@ -5,8 +5,10 @@
 				<view class="bt-img" @tap="records">
 					<image :src="toc" mode=""></image>
 				</view>
-				<textarea v-model="msg" auto-blur="true" auto-height="true" @input="inputs" @focus="focus" class="chat-send btn" :class="{displaynone:isrecord}"/>
-				<view class="record btn" :class="{displaynone:!isrecord}" @touchstart="touchstart" @touchend="touchend" @touchmove="touchmove">按住说话</view>
+				<textarea v-model="msg" cursor-spacing="30" auto-blur="true" auto-height="true" @input="inputs"
+					@focus="handleFocus" @blur="handleBlur" class="chat-send btn" :class="{displaynone:isrecord}" />
+				<view class="record btn" :class="{displaynone:!isrecord}" @touchstart="touchstart" @touchend="touchend"
+					@touchmove="touchmove">按住说话</view>
 				<view class="bt-img" @tap="emoji">
 					<image src="../../static/images/submit/bq.png" mode=""></image>
 				</view>
@@ -46,9 +48,10 @@
 				</view>
 			</view>
 		</view>
-		<view class="voice-bg" :class="{displaynone:voicebg}" >
+		<view class="voice-bg" :class="{displaynone:voicebg}">
 			<view class="voice-bg-len">
-				<view class="voice-bg-time" :style="{width:vlength / 0.6 + '%'}">{{vlength}}″</view>
+				<view class="voice-bg-time" :style="{width:vlength / 0.6  + '%'}">{{vlength}}″
+				</view>
 			</view>
 			<view class="voice-del">上滑取消录音</view>
 		</view>
@@ -60,134 +63,141 @@
 	// 录音api组件
 	let recorderManager = uni.getRecorderManager();
 	export default {
-		name:"submit",
+		name: "submit",
 		data() {
 			return {
-				isrecord:false,
-				toc:"../../static/images/submit/yy.png",
-				isemoji:true,
-				msg:'',
-				ismore:true,
-				timer:null,
-				vlength:1,
-				voicebg:true,
-				pageY:0,
+				isrecord: false,
+				toc: "../../static/images/submit/yy.png",
+				isemoji: true,
+				msg: '',
+				ismore: true,
+				timer: null,
+				vlength: 1,
+				voicebg: true,
+				pageY: 0,
 			};
 		},
-		components:{
+		components: {
 			emoji
 		},
-		methods:{
+		watch: {},
+		methods: {
 			// 获取元素高度
-			getElementHeight(){
+			getElementHeight() {
 				const query = uni.createSelectorQuery().in(this);
 				query.select('.submit').boundingClientRect(data => {
-					this.$emit('heights',data.height + 40)
+					this.$emit('heights', data.height + 40)
 				}).exec();
 			},
-			allGetHeight(){
-				setTimeout(()=>{
+			allGetHeight() {
+				setTimeout(() => {
 					this.getElementHeight();
-				},20)
+				}, 20)
 			},
 			// 点击切换音频
-			records(){
+			records() {
 				this.isrecord = !this.isrecord;
 				this.ismore = true;
 				this.isemoji = true;
-				if(this.isrecord){
+				if (this.isrecord) {
 					this.toc = '../../static/images/submit/jp.png'
-				}else{
+				} else {
 					this.toc = '../../static/images/submit/yy.png'
 				}
 				this.allGetHeight()
 			},
 			// 表情
-			emoji(){
+			emoji() {
 				this.ismore = true;
 				this.isemoji = !this.isemoji;
 				this.isrecord = false;
 				this.toc = '../../static/images/submit/yy.png';
-				this.allGetHeight()
+				this.$emit('handleEmojiAndMore', this.isemoji)
 			},
 			// 监听输入框输入
-			inputs(e){
+			inputs(e) {
 				this.msg = e.detail.value;
 				var post = this.msg.indexOf('\n');
 				// 判断键入的是否是回车键
-				if(post!=-1 && this.msg.length>1){
-					this.send(this.msg,0)//0:文字类型
+				if (post != -1 && this.msg.length > 1) {
+					this.send(this.msg, 0) //0:文字类型
 				}
 			},
 			//接收表情
-			emotion(e){
+			emotion(e) {
 				this.msg += e;
 			},
 			// 输入框聚焦
-			focus(){
+			handleFocus() {
+				this.handleBlur();
 				this.isemoji = true;
 				this.ismore = true;
-				this.allGetHeight()
+				this.$emit('inputFocus')
+			},
+			handleBlur() {
+				this.isemoji = true;
+				this.ismore = true;
+				this.$emit('inputBlur')
 			},
 			// 表情内发送
-			emojiSend(){
-				if(this.msg.length>0){
+			emojiSend() {
+				if (this.msg.length > 0) {
 					this.isemoji = !this.isemoji;
-					this.send(this.msg,0)//0:文字类型
-					this.allGetHeight()
+					this.send(this.msg, 0) //0:文字类型
+					this.$emit('handleEmojiAndMore', this.isemoji)
 				}
 			},
 			// 表情内退格
-			emojiBack(){
-				if(this.msg.length>0){
-					this.msg = this.msg.substring(0,this.msg.length-1)
+			emojiBack() {
+				if (this.msg.length > 0) {
+					this.msg = this.msg.substring(0, this.msg.length - 1)
 				}
 			},
 			// 音频处理
 			// 开始录音
-			touchstart(e){
+			touchstart(e) {
 				this.voicebg = false;
 				this.pageY = e.changedTouches[0].pageY;
 				let i = 1;
-				this.timer = setInterval(()=>{
+				this.timer = setInterval(() => {
 					i++;
 					this.vlength = i;
-					
-					if(i>60){
+					if (i > 60) {
 						this.touchend()
 					}
-				},1000)
+				}, 1000)
 				recorderManager.start();
 			},
 			// 结束录音
-			touchend(){
+			touchend() {
 				clearInterval(this.timer)
 				recorderManager.stop();
 				let self = this;
-				// if(self.vlength < 2){
-				// 	uni.showToast({
-				// 	    title: '说话时间太短',
-				// 	    duration: 3000,
-				// 		icon:'error',
-				// 	});
-				// 	return false;
-				// }
-				recorderManager.onStop(function (res) {
+				if(self.vlength < 2){
+					uni.showToast({
+					    title: `说话时间太短:${self.vlength}s`,
+					    duration: 1500,
+						icon:'error',
+					});
+					self.vlength = 1;
+					self.voicebg = true;
+					return false;
+				}
+				recorderManager.onStop(function(res) {
 					let data = {
-						voice:res.tempFilePath,
-						time:self.vlength
+						voice: res.tempFilePath,
+						time: self.vlength
 					}
-					if(!self.voicebg){
-						self.send(data,2);
+					if (!self.voicebg) {
+						self.send(data, 2);
 					}
 					self.vlength = 1;
 					self.voicebg = true;
-					
 				});
 			},
 			// 中途终止录音
-			touchmove(e){
-				if(this.pageY - e.changedTouches[0].pageY > 100){
+			touchmove(e) {
+				if (this.pageY - e.changedTouches[0].pageY > 100) {
 					// 关闭录音控件
 					clearInterval(this.timer)
 					this.voicebg = true;
@@ -195,63 +205,69 @@
 				}
 			},
 			// 发送
-			send(msg,type){
+			send(msg, type) {
 				let data = {
-					message:msg,
-					types:type,
+					message: msg,
+					types: type,
 				}
-				this.$emit('inputs',data);
-				setTimeout(()=>{
+				this.$emit('inputs', data);
+				setTimeout(() => {
 					this.msg = '';
-				},0)
+				}, 0)
 			},
 			// 更多功能
-			more(){
+			more() {
 				this.ismore = !this.ismore;
 				this.isemoji = true;
 				this.isrecord = false;
 				this.toc = '../../static/images/submit/yy.png';
 				this.allGetHeight()
+				this.$emit('handleEmojiAndMore', this.ismore)
 			},
 			// 选择图片并发送
-			sendImg(e){
+			sendImg(e) {
 				let count = 9;
 				let _this = this;
-				if(e == 'album'){
+				if (e == 'album') {
 					count = 9;
-				}else{
+				} else {
 					count = 1;
 				}
 				uni.chooseImage({
-				    count, //默认9
-				    sizeType: ['original', 'compressed'], //可以指定是原图还是压缩图，默认二者都有
-				    sourceType: [e], //从相册选择
-				    success: function (res) {
+					count, //默认9
+					sizeType: ['original', 'compressed'], //可以指定是原图还是压缩图，默认二者都有
+					sourceType: [e], //从相册选择
+					success: function(res) {
 						const filePaths = res.tempFilePaths;
-						for(let i=0; i<filePaths.length; i++){
+						_this.isemoji = true;
+						_this.ismore = true;
+						_this.$emit('handleEmojiAndMore', true)
+						for (let i = 0; i < filePaths.length; i++) {
 							// 调用发送消息方法
-							_this.send(filePaths[i],1)
-							_this.allGetHeight()
+							_this.send(filePaths[i], 1)
 						}
-				    }
+					}
 				});
 			},
-			chooseLocation(){
+			chooseLocation() {
 				uni.chooseLocation({
-				    success:res=> {
+					success: res => {
 						let data = {
-							name:res.name,
-							address:res.address,
-							latitude:res.latitude,
-							longitude:res.longitude,
+							name: res.name,
+							address: res.address,
+							latitude: res.latitude,
+							longitude: res.longitude,
 						}
-						this.send(data,3)//3:其他类型
-						this.allGetHeight()
-				        console.log('位置名称：' + res.name);
-				        console.log('详细地址：' + res.address);
-				        console.log('纬度：' + res.latitude);
-				        console.log('经度：' + res.longitude);
-				    }
+						this.isemoji = true;
+						this.ismore = true;
+						this.$emit('handleEmojiAndMore', true)
+						this.send(data, 3) //3:其他类型
+
+						console.log('位置名称：' + res.name);
+						console.log('详细地址：' + res.address);
+						console.log('纬度：' + res.latitude);
+						console.log('经度：' + res.longitude);
+					}
 				});
 			}
 		}
@@ -259,8 +275,8 @@
 </script>
 
 <style lang="scss">
-	.submit{
-		background: rgba(244,244,244,0.5);
+	.submit {
+		background: rgb(255, 255, 255);
 		border-top: 1px solid $uni-border-color;
 		width: 100%;
 		position: fixed;
@@ -268,117 +284,134 @@
 		z-index: 1003;
 		padding-bottom: env(safe-area-inset-bottom);
 	}
-	.displaynone{
+
+	.displaynone {
 		display: none;
 	}
-	.submit-chat{
+
+	.submit-chat {
 		width: 100%;
 		display: flex;
 		align-items: flex-end;
 		box-sizing: border-box;
 		padding: 14rpx 14rpx;
-		image{
+		background: #eee;
+
+		image {
 			width: 56rpx;
 			height: 56rpx;
 			margin: 0 10rpx;
 			flex: auto;
 		}
-		.btn{
+
+		.btn {
 			flex: auto;
 			background-color: #fff;
 			border-radius: 10rpx;
 			padding: 18rpx;
-			max-height:180rpx;
+			max-height: 180rpx;
 			margin: 0 10rpx;
 			overflow-y: scroll;
 		}
-		.record{
+
+		.record {
 			text-align: center;
 			line-height: 44rpx;
 			font-size: $uni-font-size-lg;
 			color: $uni-text-color-grey;
 		}
-		
+
 	}
-	.emoji{
+
+	.emoji {
 		width: 100%;
 		height: 460rpx;
-		background: rgba(236,237,238,1);
-		box-shadow: 0px -1rpx 0px 0px rgba(0,0,0,.1);
-		.emoji-send{
+		background: rgba(236, 237, 238, 1);
+		box-shadow: 0px -1rpx 0px 0px rgba(0, 0, 0, .1);
+
+		.emoji-send {
 			width: 280rpx;
 			padding-top: 24rpx;
 			height: 104rpx;
-			background-color: rgba(236,237,238,.8);
+			background-color: rgba(236, 237, 238, .8);
 			position: fixed;
 			bottom: 0;
 			bottom: env(safe-area-inset-bottom);
 			right: 0;
 			display: flex;
-			.emoji-send-bt{
+
+			.emoji-send-bt {
 				flex: 1;
 				margin: 0 32rpx 0 20rpx;
 				width: 120rpx;
 				height: 80rpx;
-				background: rgba(255,228,49,1);
+				background: rgba(255, 228, 49, 1);
 				text-align: center;
-				font-size:32rpx;
-				line-height:80rpx;
+				font-size: 32rpx;
+				line-height: 80rpx;
 				border-radius: 12rpx;
 			}
-			.emoji-send-det{
+
+			.emoji-send-det {
 				flex: 1;
 				margin-left: 24rpx;
 				height: 76rpx;
-				background:#fff;
+				background: #fff;
 				text-align: center;
-				font-size:32rpx;
-				line-height:80rpx;
+				font-size: 32rpx;
+				line-height: 80rpx;
 				border-radius: 12rpx;
 				padding-top: 4rpx;
-				image{
+
+				image {
 					width: 42rpx;
-					height:32rpx;
+					height: 32rpx;
 				}
 			}
 		}
 	}
-	.more{
+
+	.more {
 		width: 100%;
 		height: 436rpx;
-		background-color: rgba(236,237,238,1);
-		box-shadow: 0px -1rpx 0px  0px rgba(0,0,0,.1);
+		background-color: rgba(236, 237, 238, 1);
+		box-shadow: 0px -1rpx 0px 0px rgba(0, 0, 0, .1);
 		bottom: env(safe-area-inset-bottom);
-		padding:8rpx 20rpx;
+		padding: 8rpx 20rpx;
 		box-sizing: border-box;
-		.more-list{
+
+		.more-list {
 			width: 25%;
 			float: left;
 			text-align: center;
 			padding-top: 32rpx;
-			image{
+
+			image {
 				width: 72rpx;
 				height: 72rpx;
 				padding: 24rpx;
 				border-radius: 24rpx;
-				background-color: rgba(255,255,255,1);
+				background-color: rgba(255, 255, 255, 1);
 			}
-			.more-list-title{
+
+			.more-list-title {
 				font-size: 24rpx;
-				color: rgba(39,40,50,.5);
+				color: rgba(39, 40, 50, .5);
 				line-height: 34rpx;
 			}
 		}
 	}
-	.voice-bg{
+
+	.voice-bg {
 		height: 100%;
 		width: 100%;
-		background-color: rgba(0,0,0,.3);
+		background-color: rgba(0, 0, 0, .3);
 		position: fixed;
 		top: 0;
 		bottom: 0;
 		z-index: 1002;
-		.voice-bg-len{
+
+		.voice-bg-len {
 			height: 84rpx;
 			width: 600rpx;
 			position: absolute;
@@ -387,22 +420,24 @@
 			top: 0;
 			bottom: 0;
 			margin: auto;
-			background-color: rgba(255,255,255,.5);
+			background-color: rgba(255, 255, 255, .5);
 			border-radius: 42rpx;
 			text-align: center;
 		}
-		.voice-bg-time{
-			display:inline-block;
+
+		.voice-bg-time {
+			display: inline-block;
 			line-height: 84rpx;
 			background-color: $uni-color-primary;
 			border-radius: 42rpx;
-			min-width: 120rpx;
-			
+			min-width: 60rpx;
+
 		}
-		.voice-del{
+
+		.voice-del {
 			position: absolute;
 			bottom: 148rpx;
-			margin-bottom:env(safe-area-inset-bottom);
+			margin-bottom: env(safe-area-inset-bottom);
 			width: 100%;
 			text-align: center;
 			color: #fff;

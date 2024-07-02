@@ -1,14 +1,16 @@
 <template>
 	<view class="content">
 		<view class="top-bar">
-			<view class="top-bar-center">
-				<view class="text">详情</view>
-			</view>
-			<view class="top-bar-left" @click="backOne">
-				<image src="../../static/images/common/back.png" mode="" class="back-img"></image>
-			</view>
-			<view class="top-bar-right">
-				<view class="pice"></view>
+			<view class="top-bar-contaner">
+				<view class="top-bar-center">
+					<view class="text">详情</view>
+				</view>
+				<view class="top-bar-left" @click="backOne">
+					<image src="../../static/images/common/back.png" mode="" class="back-img"></image>
+				</view>
+				<view class="top-bar-right">
+					<view class="pice"></view>
+				</view>
 			</view>
 		</view>
 		<view class="main">
@@ -16,9 +18,10 @@
 				<view class="row head">
 					<view class="title">头像</view>
 					<view class="user-head">
-						<image-cropper :src="tempFilePath" @confirm="confirm"  @cancel="cancel"></image-cropper>
+						<image-cropper :src="tempFilePath" @confirm="confirm" @cancel="cancel"></image-cropper>
 						<image :src="imgurl" @tap="upload" class="user-img"></image>
-						<canvas  id="myCanvas"  canvas-id="myCanvas" class="meslist_canvas" crop-width="200"  crop-height="200"></canvas>
+						<canvas id="myCanvas" canvas-id="myCanvas" class="meslist_canvas" crop-width="200"
+							crop-height="200"></canvas>
 					</view>
 					<view class="more">
 						<image src="../../static/images/common/more.png" mode="aspectFit"></image>
@@ -58,7 +61,8 @@
 				<view class="row">
 					<view class="title">生日</view>
 					<view class="cont">
-						<picker mode="date" :value="dataarr.birth" :start="startDate" :end="endDate" @change="bindDateChange">
+						<picker mode="date" :value="dataarr.birth" :start="startDate" :end="endDate"
+							@change="bindDateChange">
 							<view class="uni-input">{{dataarr.birth}}</view>
 						</picker>
 					</view>
@@ -100,7 +104,8 @@
 				<view class="define" @tap="modifyStbmit">确定</view>
 			</view>
 			<view class="modfiy-main">
-				<input v-show="ispwd" type="text" v-model="pwd" class="modfiy-pwd" placeholder="请输入原密码" placeholder-style="color:#bbb;font-weight:400;"></input>
+				<input v-show="ispwd" type="text" v-model="pwd" class="modfiy-pwd" placeholder="请输入原密码"
+					placeholder-style="color:#bbb;font-weight:400;"></input>
 				<textarea v-model="dataText" class="modfiy-content" placeholder="" />
 			</view>
 		</view>
@@ -116,32 +121,34 @@
 				format: true
 			})
 			return {
-				dataarr:{
-					name:'思琪',
-					sign:'我爱你你爱我蜜雪冰城甜蜜蜜,我爱你你爱我蜜雪冰城甜蜜蜜我爱你你爱我蜜雪冰城甜蜜蜜',
-					importTime:new Date(),
-					sex:1,
-					birth:'1998-04-12',
-					tell:'15017872699',
-					mail:'15017872699@163com',
+				dataarr: {
+					name: '思琪',
+					sign: '我爱你你爱我蜜雪冰城甜蜜蜜,我爱你你爱我蜜雪冰城甜蜜蜜我爱你你爱我蜜雪冰城甜蜜蜜',
+					importTime: new Date(),
+					sex: 1,
+					birth: '1998-04-12',
+					tell: '15017872699',
+					mail: '15017872699@163com',
 				},
 				imgurl: '../../static/images/img/four.png',
 				array: ['男', '女', '未知'],
 				index: 1,
 				date: currentDate,
 				tempFilePath: '',
-				modifyTitle:'',
-				dataText:'修改的内容',
-				pwd:'',
-				animationData:{},//动画实例
-				isModfiy:false,//动画开关
-				widHeight:'',
-				ispwd:false,
-				uid:'1',
-				id:'1',
+				modifyTitle: '',
+				dataText: '修改的内容',
+				pwd: '',
+				animationData: {}, //动画实例
+				isModfiy: false, //动画开关
+				widHeight: '',
+				ispwd: false,
+				uid: '1',
+				id: '1',
 			};
 		},
-		components:{ImageCropper},
+		components: {
+			ImageCropper
+		},
 		computed: {
 			startDate() {
 				return this.getDate('start');
@@ -160,7 +167,7 @@
 					data: 1
 				})
 			},
-			changeTime(date){
+			changeTime(date) {
 				return myfun.detailTime(date);
 			},
 			// 性别选择器
@@ -192,7 +199,7 @@
 				uni.chooseImage({
 					count: 1, //默认9
 					sizeType: ['original', 'compressed'], //可以指定是原图还是压缩图，默认二者都有
-					sourceType: ['album','camera'], //从相册选择
+					sourceType: ['album', 'camera'], //从相册选择
 					success: (res) => {
 						this.tempFilePath = res.tempFilePaths.shift()
 					}
@@ -205,7 +212,7 @@
 				//除了H5端返回base64数据外，其他端都是返回临时地址，所以你要判断base64还是临时文件名，（用条件编译APP-PLUS||MP执行编译。）
 				//按我这里是先上传裁剪得来的临时文件地址然后得到临时文件名，
 				//待活你要判断是H5还是其他端传给后端类型参数让后端判断执行何种情况代码就OK了
-			
+
 				uni.uploadFile({
 					url: "后端地址上传图片接口地址",
 					filePath: this.imgurl,
@@ -213,22 +220,22 @@
 					fileType: "image",
 					//formData:{},传递参数
 					success: (uploadFileRes) => {
-					  var backstr = uploadFileRes.data;
-					  //自定义操作
+						var backstr = uploadFileRes.data;
+						//自定义操作
 					},
-			
+
 					fail(e) {
-					  console.log("this is errormes " + e.message);
+						console.log("this is errormes " + e.message);
 					},
 				});
-				
+
 				// #endif
 			},
 			cancel() {
 				console.log('canceled')
 			},
 			// 获取元素位置等信息
-			getElementStyle(){
+			getElementStyle() {
 				const query = uni.createSelectorQuery().in(this);
 				query.select('.modify').boundingClientRect(data => {
 					console.log("得到布局位置信息" + JSON.stringify(data));
@@ -237,24 +244,24 @@
 				}).exec();
 			},
 			// 修改项弹框
-			modify(type,data,ispwd){
+			modify(type, data, ispwd) {
 				this.isModfiy = !this.isModfiy;
 				this.ispwd = ispwd;
 				this.modifyTitle = type;
 				this.dataText = data;
 				var animation = uni.createAnimation({
-					duration:300,
-					timingFunction:"ease",
+					duration: 300,
+					timingFunction: "ease",
 				})
-				if(this.isModfiy){
+				if (this.isModfiy) {
 					animation.bottom(0).step();
-				}else{
+				} else {
 					animation.bottom(-this.widHeight).step();
 				}
 				this.animationData = animation.export()
 			},
 			// 弹窗修改确定
-			modifyStbmit(){
+			modifyStbmit() {
 				this.modify()
 			}
 		}
@@ -335,80 +342,89 @@
 		}
 
 		.bt2 {
-			margin-top: 160rpx;
+			margin-top: 30rpx;
 			text-align: center;
 			font-size: $uni-font-size-lg;
 			font-weight: 400;
 			color: $uni-color-warning;
 			line-height: 88rpx;
 		}
-		.meslist_canvas{
+
+		.meslist_canvas {
 			position: fixed;
-			top:0;
+			top: 0;
 			width: 200px;
 			height: 200px;
 			visibility: hidden;
 		}
 	}
+
 	// 修改弹框
-	.modify{
+	.modify {
 		position: fixed;
 		z-index: 1002;
 		left: 0;
 		height: 100%;
 		width: 100%;
 		background-color: #fff;
-		.modify-header{
-			width:100%;
+
+		.modify-header {
+			width: 100%;
 			height: 88rpx;
 			padding-top: var(--status-bar-height);
 			display: flex;
 			flex-direction: row;
 			align-items: center;
 			border-bottom: 1px solid $uni-border-color;
-			.close{
+
+			.close {
 				padding-left: 32rpx;
 				font-size: $uni-font-size-lg;
 				color: $uni-text-color;
 				line-height: 44rpx;
 			}
-			.title{
+
+			.title {
 				line-height: 88rpx;
 				color: $uni-text-color;
-				font-size:40rpx;
+				font-size: 40rpx;
 				flex: auto;
 				text-align: center;
 			}
-			.define{
+
+			.define {
 				padding-right: $uni-spacing-col-base;
 				font-size: $uni-font-size-lg;
 				color: $uni-color-success;
 				line-height: 44rpx;
 			}
 		}
-		.modfiy-main{
+
+		.modfiy-main {
 			display: flex;
-			padding:$uni-spacing-col-base;
+			padding: $uni-spacing-col-base;
 			flex-direction: column;
-			.modfiy-pwd{
+
+			.modfiy-pwd {
 				flex: auto;
 				width: 100%;
 				padding: 0 20rpx;
 				box-sizing: border-box;
 				height: 88rpx;
 				margin-bottom: $uni-spacing-col-base;
-				background:$uni-bg-color-grey;
+				background: $uni-bg-color-grey;
 				border-radius: $uni-border-radius-base;
 				font-size: $uni-font-size-lg;
 				color: $uni-text-color;
 				line-height: 88rpx;
-				
+
 			}
-			.modfiy-content{
+
+			.modfiy-content {
 				flex: auto;
 				width: 100%;
 				height: 386rpx;
-				background:$uni-bg-color-grey;
+				background: $uni-bg-color-grey;
 				border-radius: $uni-border-radius-base;
 				font-size: $uni-font-size-lg;
 				color: $uni-text-color;
