@@ -13,8 +13,10 @@
 						<image src="../../static/images/index/add.png" mode=""></image>
 					</view>
 				</view>
-				<navigator class="top-bar-left" url="../userhome/userhome?id=aaa" hover-class="none">
-					<image src="../../static/images/img/four.png" mode=""></image>
+				<navigator class="top-bar-left" :url="'../userhome/userhome?user_id=' + userInfo.user_id"
+					hover-class="none">
+					<!-- ../../static/images/img/four.png -->
+					<image :src="userInfo.avatar" mode=""></image>
 				</navigator>
 			</view>
 		</view>
@@ -50,22 +52,66 @@
 				</view>
 			</view>
 		</view>
+
+		<!-- 提示信息弹窗 -->
+		<uni-popup ref="messageTost" type="message">
+			<uni-popup-message :type="msgType" :message="messageText" :duration="2000"></uni-popup-message>
+		</uni-popup>
 	</view>
 </template>
 
 <script>
+	import request from '@/request/http';
 	import datas from '../../commons/js/datas.js';
 	import myfun from '../../commons/js/myfun.js';
 	export default {
 		data() {
 			return {
-				friends: []
+				user_id:'',
+				userInfo: {},
+				friends: [],
+				msgType: '',
+				messageText: '',
+				token: null,
 			}
 		},
-		onLoad() {
-			this.getFrinds()
+		onLoad(options) {
+			uni.showLoading({
+				title: '加载中...',
+			})
+			this.user_id = uni.getStorageSync('xiaoyuApp_userid');
+			this.token = uni.getStorageSync('xiaoyuApp_token')
+			setTimeout(() => {
+				uni.hideLoading()
+				this.getUserInfo()
+			}, 200)
 		},
 		methods: {
+			async getUserInfo() {
+				try {
+					const res = await request('/getUserInfo', 'POST', {
+						user_id: this.user_id
+					})
+					console.log(res);
+					if (res.code === 200) {
+						this.userInfo = res.userInfo;
+						uni.setStorageSync('userInfo', JSON.stringify(res.userInfo));
+						console.log(this.userInfo);
+						this.getFrinds();
+					} else if (res.code === 401) {
+						this.messageToggle('error', res.error)
+						uni.removeStorageSync('xiaoyuApp_token');
+						uni.removeStorageSync('xiaoyuApp_userid');
+						setTimeout(() => {
+							uni.navigateTo({
+								url: `/pages/signin/signin`
+							})
+						}, 1500)
+					}
+				} catch (error) {
+					console.log(error);
+				}
+			},
 			// 跳转至搜索页面
 			toSearch() {
 				uni.navigateTo({
@@ -108,32 +154,12 @@
 						'&title=' + e.name
 				})
 			},
-			// 封装请求使用方法一
-			testRequest1() {
-				this.$minApi.uniapp({
-					wd: 'uni-app'
-				}).then(res => {
-					this.res = res
-					console.log(res)
-				}).catch(err => {
-					console.log(err)
-				})
+			// tost消息窗
+			messageToggle(type, text) {
+				this.msgType = type
+				this.messageText = text
+				this.$refs.messageTost.open()
 			},
-
-			// 封装请求使用方式二
-			async testRequest2() {
-				try {
-					const res = await this.$minApi.uniapp({
-						wd: 'uni-app'
-					})
-					console.log(res)
-				} catch (err) {
-					console.log(err)
-				}
-			},
-			
-			// 监听返回键
-			// onBackPress
 		}
 	}
 </script>

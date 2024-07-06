@@ -19,7 +19,7 @@
 					<view class="title">头像</view>
 					<view class="user-head">
 						<image-cropper :src="tempFilePath" @confirm="confirm" @cancel="cancel"></image-cropper>
-						<image :src="imgurl" @tap="upload" class="user-img"></image>
+						<image :src="userInfo.avatar" @tap="upload" class="user-img"></image>
 						<canvas id="myCanvas" canvas-id="myCanvas" class="meslist_canvas" crop-width="200"
 							crop-height="200"></canvas>
 					</view>
@@ -27,22 +27,22 @@
 						<image src="../../static/images/common/more.png" mode="aspectFit"></image>
 					</view>
 				</view>
-				<view class="row" @tap="modify('签名',dataarr.sign,false)">
+				<view class="row" @tap="modify('签名','signature',userInfo.signature,false)">
 					<view class="title">签名</view>
-					<view class="cont">{{dataarr.sign}}</view>
+					<view class="cont">{{userInfo.signature}}</view>
 					<view class="more">
 						<image src="../../static/images/common/more.png" mode="aspectFit"></image>
 					</view>
 				</view>
 				<view class="row">
 					<view class="title">注册</view>
-					<view class="cont">{{changeTime(dataarr.importTime)}}</view>
+					<view class="cont">{{changeTime(userInfo.registration_time)}}</view>
 				</view>
 			</view>
 			<view class="column heads">
-				<view class="row" @tap="modify('昵称',dataarr.name,false)">
+				<view class="row" @tap="modify('昵称','username',userInfo.username,false)">
 					<view class="title">昵称</view>
-					<view class="cont">{{dataarr.name}}</view>
+					<view class="cont">{{userInfo.username}}</view>
 					<view class="more">
 						<image src="../../static/images/common/more.png" mode="aspectFit"></image>
 					</view>
@@ -50,8 +50,8 @@
 				<view class="row">
 					<view class="title">性别</view>
 					<view class="cont">
-						<picker @change="bindPickerChange" :value="dataarr.sex" :range="array">
-							<view class="uni-input">{{array[dataarr.sex]}}</view>
+						<picker @change="bindPickerChange" :value="userInfo.gender" :range="genderArray">
+							<view class="uni-input">{{genderArray[userInfo.gender]}}</view>
 						</picker>
 					</view>
 					<view class="more">
@@ -61,32 +61,32 @@
 				<view class="row">
 					<view class="title">生日</view>
 					<view class="cont">
-						<picker mode="date" :value="dataarr.birth" :start="startDate" :end="endDate"
-							@change="bindDateChange">
-							<view class="uni-input">{{dataarr.birth}}</view>
+						<picker mode="date" :value="userInfo.birthday" :start="startDate" :end="endDate"
+							@change="bindDateChange" class="picker-box">
+							<view class="uni-input">{{userInfo.birthday}}</view>
 						</picker>
 					</view>
 					<view class="more">
 						<image src="../../static/images/common/more.png" mode="aspectFit"></image>
 					</view>
 				</view>
-				<view class="row" @tap="modify('电话',dataarr.tell,true)">
+				<view class="row" @tap="modify('电话','phone',userInfo.phone,false)">
 					<view class="title">电话</view>
-					<view class="cont">{{dataarr.tell}}</view>
+					<view class="cont">{{userInfo.phone}}</view>
 					<view class="more">
 						<image src="../../static/images/common/more.png" mode="aspectFit"></image>
 					</view>
 				</view>
-				<view class="row" @tap="modify('邮箱',dataarr.mail,true)">
+				<view class="row" @tap="modify('邮箱','email',userInfo.email,false)">
 					<view class="title">邮箱</view>
-					<view class="cont">{{dataarr.mail}}</view>
+					<view class="cont">{{userInfo.email}}</view>
 					<view class="more">
 						<image src="../../static/images/common/more.png" mode="aspectFit"></image>
 					</view>
 				</view>
 			</view>
 			<view class="column heads">
-				<view class="row">
+				<view class="row" @tap="modify('修改密码','password',userInfo.password,true)">
 					<view class="title">密码</view>
 					<view class="cont">*******</view>
 					<view class="more">
@@ -94,9 +94,10 @@
 					</view>
 				</view>
 			</view>
-			<view class="bt2" v-if="uid == id" @tap="quit">退出登录</view>
-			<view class="bt2" v-if="uid != id" @tap="deleteFriend">删除好友</view>
+			<view class="bt2" v-if="user_id == userInfo.user_id" @tap="quit">退出登录</view>
+			<view class="bt2" v-if="user_id != userInfo.user_id" @tap="deleteFriend">删除好友</view>
 		</view>
+
 		<view class="modify" :animation="animationData" :style="{bottom:-+widHeight + 'px'}">
 			<view class="modify-header">
 				<view class="close" @tap="modify()">取消</view>
@@ -104,15 +105,39 @@
 				<view class="define" @tap="modifyStbmit">确定</view>
 			</view>
 			<view class="modfiy-main">
-				<input v-show="ispwd" type="text" v-model="pwd" class="modfiy-pwd" placeholder="请输入原密码"
-					placeholder-style="color:#bbb;font-weight:400;"></input>
-				<textarea v-model="dataText" class="modfiy-content" placeholder="" />
+
+				<textarea v-show="titleKey == 'signature'" v-model="dataText" class="modfiy-content"
+					placeholder="请输入个性签名" />
+
+				<input v-show="titleKey == 'username'" type="text" v-model="dataText" class="modfiy-pwd"
+					placeholder="请输入昵称" placeholder-class="ipt-placeholder-style" maxlength="30"></input>
+
+				<input v-show="titleKey == 'phone'" type="text" v-model="dataText" class="modfiy-pwd"
+					placeholder="请输入电话" placeholder-class="ipt-placeholder-style" maxlength="11"></input>
+
+				<input v-show="titleKey == 'email'" type="text" v-model="dataText" class="modfiy-pwd"
+					placeholder="请输入邮箱" placeholder-class="ipt-placeholder-style" maxlength="35"></input>
+
+				<template v-if="titleKey == 'password' && ispwd">
+					<input type="text" v-model="password" class="modfiy-pwd" placeholder="请输入原密码"
+						placeholder-class="ipt-placeholder-style"></input>
+					<input type="text" v-model="newPassword" class="modfiy-pwd" placeholder="请输入新密码"
+						placeholder-class="ipt-placeholder-style"></input>
+				</template>
+
 			</view>
 		</view>
+
+		<!-- 提示窗示例 -->
+		<uni-popup ref="alertDialog" type="dialog" :mask-click="false">
+			<uni-popup-dialog type="dialog" cancelText="取消" confirmText="确认" title="系统提示" content="您是否确认退出登录?"
+				@confirm="dialogConfirm" @close="dialogClose" :before-close="true"></uni-popup-dialog>
+		</uni-popup>
 	</view>
 </template>
 
 <script>
+	import request from '@/request/http';
 	import ImageCropper from "@/components/ling-imgcropper/ling-imgcropper.vue";
 	import myfun from "@/commons/js/myfun.js";
 	export default {
@@ -121,29 +146,22 @@
 				format: true
 			})
 			return {
-				dataarr: {
-					name: '思琪',
-					sign: '我爱你你爱我蜜雪冰城甜蜜蜜,我爱你你爱我蜜雪冰城甜蜜蜜我爱你你爱我蜜雪冰城甜蜜蜜',
-					importTime: new Date(),
-					sex: 1,
-					birth: '1998-04-12',
-					tell: '15017872699',
-					mail: '15017872699@163com',
-				},
+				userInfo: null,
 				imgurl: '../../static/images/img/four.png',
-				array: ['男', '女', '未知'],
-				index: 1,
-				date: currentDate,
+				genderArray: ['女', '男'],
+				birthday: 1,
+				birthday: currentDate,
 				tempFilePath: '',
 				modifyTitle: '',
 				dataText: '修改的内容',
-				pwd: '',
+				password: '',
+				newPassword: '',
 				animationData: {}, //动画实例
 				isModfiy: false, //动画开关
 				widHeight: '',
 				ispwd: false,
-				uid: '1',
-				id: '1',
+				user_id: '',
+				titleKey: '',
 			};
 		},
 		components: {
@@ -160,6 +178,10 @@
 		onReady() {
 			this.getElementStyle();
 		},
+		onLoad(options) {
+			this.user_id = options.user_id;
+			this.userInfo = uni.getStorageSync('userInfo') ? JSON.parse(uni.getStorageSync('userInfo')) : null;
+		},
 		methods: {
 			// 返回至上一页
 			backOne() {
@@ -173,11 +195,13 @@
 			// 性别选择器
 			bindPickerChange: function(e) {
 				console.log('picker发送选择改变，携带值为', e.target.value)
-				this.index = e.target.value
+				this.gender = e.target.value;
+				this.userInfo.gender = e.target.value;
 			},
 			// 日期选择器
 			bindDateChange: function(e) {
-				this.date = e.target.value
+				this.birthday = e.target.value;
+				this.userInfo.birthday = e.target.value;
 			},
 			getDate(type) {
 				const date = new Date();
@@ -218,7 +242,7 @@
 					filePath: this.imgurl,
 					name: "file",
 					fileType: "image",
-					//formData:{},传递参数
+					formData: {}, //传递参数
 					success: (uploadFileRes) => {
 						var backstr = uploadFileRes.data;
 						//自定义操作
@@ -244,12 +268,15 @@
 				}).exec();
 			},
 			// 修改项弹框
-			modify(type, data, ispwd) {
+			modify(type, key, title, ispwd) {
 				this.isModfiy = !this.isModfiy;
 				this.ispwd = ispwd;
 				this.modifyTitle = type;
-				this.dataText = data;
-				var animation = uni.createAnimation({
+				this.dataText = title;
+				this.titleKey = key;
+				console.log(key);
+
+				let animation = uni.createAnimation({
 					duration: 300,
 					timingFunction: "ease",
 				})
@@ -262,8 +289,42 @@
 			},
 			// 弹窗修改确定
 			modifyStbmit() {
+				this.userInfo[this.titleKey] = this.dataText;
 				this.modify()
-			}
+			},
+			// 退出登录
+			quit() {
+				this.$refs.alertDialog.open()
+			},
+			// 删除好友
+			deleteFriend() {
+
+			},
+			async dialogConfirm() {
+				this.$refs.alertDialog.close();
+				uni.showLoading({
+					title: '退出中...',
+					mask: true,
+				})
+				try {
+					const res = await request('/logout', 'POST');
+					if (res.code === 200) {
+						setTimeout(() => {
+							uni.removeStorageSync('xiaoyuApp_token');
+							uni.removeStorageSync('xiaoyuApp_userid');
+							uni.reLaunch({
+								url: `/pages/signin/signin`
+							})
+							uni.hideLoading()
+						}, 500)
+					}
+				} catch (error) {
+					console.log(error);
+				}
+			},
+			dialogClose() {
+				this.$refs.alertDialog.close()
+			},
 		}
 	}
 </script>
@@ -277,8 +338,8 @@
 	}
 
 	.main {
-		padding-top: var(--status-bar-height); // 处理app端顶部自定义tabbar被消息栏遮挡问题
-		margin-top: 118rpx;
+		// padding-top: var(--status-bar-height); // 处理app端顶部自定义tabbar被消息栏遮挡问题
+		padding-top: 100rpx;
 		display: flex;
 		flex-direction: column;
 
@@ -326,6 +387,11 @@
 				overflow: hidden;
 				text-overflow: ellipsis;
 				white-space: nowrap;
+
+				.picker-box {
+					width: 100%;
+					height: 100%;
+				}
 			}
 
 			.more {

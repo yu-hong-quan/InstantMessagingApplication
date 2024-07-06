@@ -127,6 +127,7 @@
 					border-radius: 10rpx;
 					padding: 0 60rpx 0 12rpx;
 					font-size: 25rpx;
+					width: 510rpx;
 				}
 
 				.search-img {

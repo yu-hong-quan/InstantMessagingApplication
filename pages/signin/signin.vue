@@ -8,36 +8,53 @@
 			</view>
 		</view>
 		<view class="logo">
-			<image src="../../static/images/index/logo.png" mode="" @tap="testToken"></image>
+			<image src="../../static/images/index/logo.png" mode=""></image>
 		</view>
 		<view class="main">
 			<view class="title">登录</view>
-			<view class="slogan">您好，欢迎来到yike！</view>
+			<view class="slogan">您好，欢迎来到小鱼交友App！</view>
 			<view class="inputs">
-				<input type="text" value="" placeholder="用户名/邮箱" placeholder-style="color:#bbb;font-weight:400;"
+				<input type="text" :value="user" placeholder="用户名" placeholder-style="color:#bbb;font-weight:400;"
 					class="user" @blur="getUser" />
-				<input type="password" value="" placeholder="密码" placeholder-style="color:#bbb;font-weight:400;"
+				<input type="text" :value="psw" placeholder="密码" placeholder-style="color:#bbb;font-weight:400;"
 					class="psw" @blur="getPassword" />
 			</view>
-			<view class="tips">输入用户或密码错误!</view>
+			<view class="tips" v-show="isShowTips">用户名或密码错误!</view>
 		</view>
 		<view class="submit" @tap="login">登录</view>
+
+		<!-- 提示信息弹窗 -->
+		<uni-popup ref="messageTost" type="message">
+			<uni-popup-message :type="msgType" :message="messageText" :duration="2000"></uni-popup-message>
+		</uni-popup>
 	</view>
 </template>
 
 <script>
 	import {
-		apis
-	} from '../../request/api.js';
+		debounce
+	} from '../../utils/index.js';
+	import request from '@/request/http';
 	export default {
 		data() {
 			return {
-				user: '',
-				psw: '',
+				user: '小余',
+				psw: '123123',
 				token: '',
+				isShowTips: false,
+				msgType: '',
+				messageText: '',
+				isClickLogin: true,
 			};
 		},
-		mounted() {},
+		onLoad(options) {
+			console.log(options);
+			uni.removeStorageSync('xiaoyuApp_token');
+			uni.removeStorageSync('userInfo');
+			if (options.username) {
+				this.user = options.username;
+			}
+		},
 		methods: {
 			// 跳转至注册页面
 			toSignUp() {
@@ -54,73 +71,50 @@
 				this.psw = e.detail.value;
 			},
 			// 登录提交
-			login() {
-				if (this.user && this.psw) {
-					console.log('提交')
+			async login() {
+				if (this.user && this.psw && this.isClickLogin) {
+					this.isClickLogin = false;
+					uni.showLoading({
+						title: '正在登录中...',
+						mask: true,
+					});
+					try {
+						const res = await request('/login', 'POST', {
+							username: this.user,
+							password: this.psw,
+						})
+						if (res.code === 200) {
+							uni.setStorageSync('xiaoyuApp_token', res.token);
+							uni.setStorageSync('xiaoyuApp_userid',res.user_id);
+							this.token = res.token;
+							this.messageToggle('success', '登录成功');
+							setTimeout(() => {
+								uni.hideLoading();
+								uni.reLaunch({
+									url:`/pages/index/index`
+								})
+								this.user = '';
+								this.psw = '';
+							}, 1000)
+						} else if (res.code === 401) {
+							uni.hideLoading();
+							this.messageToggle('error', '用户名或密码错误，请重新输入')
+							this.isClickLogin = true;
+						}
+					} catch {
+						this.isClickLogin = true;
+					}
+				} else {
+					this.messageToggle('warn', '请输入用户名或密码');
+					this.isClickLogin = true;
 				}
-				// uni.request({
-				// 	url:'http://192.168.31.198:3003/signup/add',
-				// 	data:{mail:'360151193@qq.com',name:'小余',pwd:'aabbcc'},
-				// 	method:'POST',
-				// 	success:(data)=>{ 
-				// 		console.log(data)
-				// 	}
-				// })
-				// 登录
-				uni.request({
-					url: 'http://192.168.31.198:3003/signup/match',
-					data: {
-						data: '小余',
-						pwd: 'aabbcc'
-					},
-					method: 'POST',
-					success: (data) => {
-						console.log(data)
-						this.token = data.data.back.token;
-
-					}
-				})
 			},
-			// 发送邮箱
-			sendEmail() {
-				uni.request({
-					url: 'http://192.168.31.198:3003/mail',
-					data: {
-						mail: '360151193@qq.com'
-					},
-					method: 'POST',
-					success: (data) => {
-						console.log(data)
-					}
-				})
+			// tost消息窗
+			messageToggle(type, text) {
+				this.msgType = type
+				this.messageText = text
+				this.$refs.messageTost.open()
 			},
-			// token测试
-			testToken() {
-				uni.request({
-					url: 'http://192.168.31.198:3003/sigin/testToken',
-					data: {
-						token: this.token
-					},
-					method: 'POST',
-					success: (data) => {
-
-						console.log(data)
-					}
-				})
-			},
-			// 注册
-			async signupFnc() {
-				try {
-					const res = await this.$minApi.signup({
-						mail: '15017872695@163.com',
-						name: '小余',
-						pwd: 'aabbcc'
-					})
-					console.log(res)
-				} catch (err) {
-					console.log(err)
-				}
-			}
 		}
 	}
 </script>

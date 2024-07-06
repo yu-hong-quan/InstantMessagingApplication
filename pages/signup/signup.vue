@@ -14,35 +14,43 @@
 			<view class="title">注册</view>
 			<view class="inputs">
 				<view class="inputs-div">
-					<input type="text" value="" placeholder="请取个名字" placeholder-style="color:#bbb;font-weight:400;"
+					<input type="text" value="" placeholder="请取个名字" placeholder-class="ipt-placeholder-style"
 						@input="getUsr" class="user" />
 					<view class="employ" v-show="useremploy">名字已被占用</view>
 					<image src="../../static/images/sign/right1.png" mode="" class="ok" v-show="isuser"></image>
 				</view>
 				<view class="inputs-div">
-					<input type="text" value="" placeholder="请输入邮箱" placeholder-style="color:#bbb;font-weight:400;"
+					<input type="text" value="" placeholder="请输入邮箱" placeholder-class="ipt-placeholder-style"
 						@input="isemailFnc" class="email" />
 					<view class="employ" v-show="emailemploy">邮箱已被占用</view>
 					<view class="invalid" v-show="invalid">邮箱无效</view>
 					<image src="../../static/images/sign/right1.png" mode="" class="ok" v-show="isemail"></image>
 				</view>
 				<view class="inputs-div">
-					<input :type="type" value="" placeholder="请输入密码" placeholder-style="color:#bbb;font-weight:400;"
-						@input="getPsw" class="psw" />
+					<input :type="type" value="" placeholder="请输入密码且长度不得小于5" @input="getPsw" class="psw"
+						placeholder-class="ipt-placeholder-style" />
 					<image :src="lookurl" mode="" class="look" @click="looks"></image>
 				</view>
 
 			</view>
 		</view>
-		<view :class="[{submit:isok},{submit1:!isok}]">注册</view>
+		<view :class="[{submit:isok},{submit1:!isok}]" @click="isok ? submit() : ''">注册</view>
+
+		<!-- 提示信息弹窗 -->
+		<uni-popup ref="messageTost" type="message">
+			<uni-popup-message :type="msgType" :message="messageText" :duration="2500"></uni-popup-message>
+		</uni-popup>
 	</view>
 </template>
 
 <script>
+	import {
+		debounce
+	} from '../../utils/index.js';
+	import request from '@/request/http';
 	export default {
 		data() {
 			return {
-				type: 'password',
 				isuser: false, //用户名是否可用
 				isemail: false, //邮箱是否可用
 				look: true, //是否显示密码
@@ -50,10 +58,14 @@
 				useremploy: false, //用户名是否被占用
 				emailemploy: false, //邮箱是否被占用
 				lookurl: '../../static/images/sign/look.png',
+				type:'text',
 				email: '', //邮箱
 				user: '', //用户名称
 				psw: '', //密码
 				isok: false,
+				msgType: '',
+				messageText: '',
+				isClickSubmit: true,
 			};
 		},
 		methods: {
@@ -75,12 +87,11 @@
 					this.lookurl = '../../static/images/sign/look.png';
 				}
 			},
-			// 判断是否为邮箱格式
-			isemailFnc(e) {
-				console.log(e.detail.value)
-				let reg = /^[A-Za-z\d]+([-_.][A-Za-z\d]+)*@([A-Za-z\d]+[-.])+[A-Za-z\d]{2,5}$/;
-				this.email = e.detail.value;
-				if (this.email.length > 0) {
+			// 监听邮箱输入
+			isemailFnc: debounce(function(e) {
+				if (e.detail.value.trim() !== '') {
+					let reg = /^[A-Za-z\d]+([-_.][A-Za-z\d]+)*@([A-Za-z\d]+[-.])+[A-Za-z\d]{2,5}$/;
+					this.email = e.detail.value;
 					if (reg.test(this.email)) {
 						this.invalid = false;
 						this.isemail = true;
@@ -89,27 +100,87 @@
 						this.isemail = false;
 					}
 				} else {
-					this.invalid = true;
+					this.invalid = false;
 					this.isemail = false;
 				}
-			},
-			// 获取用户名
-			getUsr(e) {
-				this.user = e.detail.value;
-				this.isOk();
-			},
-			// 获取密码
-			getPsw(e) {
+
+			}, 500),
+			// 监听用户名输入
+			getUsr: debounce(function(e) {
+				if (e.detail.value.trim() !== '') {
+					this.user = e.detail.value.trim();
+					this.checkUserExists(this.user);
+					this.isOk();
+				} else {
+					this.isuser = false;
+					this.useremploy = false;
+				}
+			}, 500),
+			// 监听密码输入
+			getPsw: debounce(function(e) {
 				this.psw = e.detail.value;
 				this.isOk()
-			},
+			}, 500),
 			// 判断是否可以点击注册了
 			isOk() {
-				if (this.isuser && this.isemail && this.psw.length > 5) {
+				if (this.isuser && this.isemail && this.psw.length >= 5) {
 					this.isok = true;
 				} else {
 					this.isok = false;
 				}
+			},
+			// 查询用户名是否存在
+			async checkUserExists(val) {
+				try {
+					const res = await request('/checkUserExists', 'POST', {
+						username: val
+					});
+					console.log(res);
+					if (res.code === 200 && res.user_id) {
+						this.useremploy = true;
+						this.isuser = false;
+						this.messageToggle('error', '名字已被占用，请重新输入')
+					} else {
+						this.isuser = true;
+						this.useremploy = false;
+					}
+				} catch {
+					console.log('Failed to fetch user data:');
+				}
+			},
+			// 提交注册
+			async submit() {
+				if (this.isClickSubmit) {
+					this.isClickSubmit = false;
+					uni.showLoading({
+						title: '正在注册中...',
+						mask: true,
+					});
+					try {
+						const res = await request('/register', 'POST', {
+							username: this.user,
+							password: this.psw,
+							email: this.email
+						})
+						if (res.code === 200) {
+							uni.hideLoading();
+							this.messageToggle('success', res.message)
+							setTimeout(() => {
+								uni.navigateTo({
+									url: `/pages/signin/signin?username=${res.username}`
+								})
+							}, 800)
+						}
+					} catch {
+						this.isClickSubmit = true;
+					}
+				}
+			},
+			// tost消息窗
+			messageToggle(type, text) {
+				this.msgType = type
+				this.messageText = text
+				this.$refs.messageTost.open()
 			},
 		}
 	}
