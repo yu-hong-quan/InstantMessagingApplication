@@ -85,6 +85,7 @@
 				uni.hideLoading()
 				this.getUserInfo()
 			}, 200)
+			
 		},
 		methods: {
 			async getUserInfo() {
@@ -138,7 +139,6 @@
 				for (let i = 0; i < this.friends.length; i++) {
 					this.friends[i].imgurl = '../../static/images/img/' + this.friends[i].imgurl;
 				}
-				console.log(this.friends)
 			},
 			// 跳转至好友添加列表
 			goGoodFriend() {

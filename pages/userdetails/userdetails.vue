@@ -14,88 +14,90 @@
 			</view>
 		</view>
 		<view class="main">
-			<view class="column heads">
-				<view class="row head">
-					<view class="title">头像</view>
-					<view class="user-head">
-						<image-cropper :src="tempFilePath" @confirm="confirm" @cancel="cancel"></image-cropper>
-						<image :src="userInfo.avatar" @tap="upload" class="user-img"></image>
-						<canvas id="myCanvas" canvas-id="myCanvas" class="meslist_canvas" crop-width="200"
-							crop-height="200"></canvas>
+			<view class="main-content">
+				<view class="column heads">
+					<view class="row head">
+						<view class="title">头像</view>
+						<view class="user-head">
+							<image-cropper :src="tempFilePath" @confirm="confirm" @cancel="cancel"></image-cropper>
+							<image :src="userInfo.avatar" @tap="upload" class="user-img"></image>
+							<canvas id="myCanvas" canvas-id="myCanvas" class="meslist_canvas" crop-width="200"
+								crop-height="200"></canvas>
+						</view>
+						<view class="more">
+							<image src="../../static/images/common/more.png" mode="aspectFit"></image>
+						</view>
 					</view>
-					<view class="more">
-						<image src="../../static/images/common/more.png" mode="aspectFit"></image>
+					<view class="row" @tap="modify('签名','signature',userInfo.signature,false)">
+						<view class="title">签名</view>
+						<view class="cont">{{userInfo.signature}}</view>
+						<view class="more">
+							<image src="../../static/images/common/more.png" mode="aspectFit"></image>
+						</view>
+					</view>
+					<view class="row">
+						<view class="title">注册</view>
+						<view class="cont">{{changeTime(userInfo.registration_time)}}</view>
 					</view>
 				</view>
-				<view class="row" @tap="modify('签名','signature',userInfo.signature,false)">
-					<view class="title">签名</view>
-					<view class="cont">{{userInfo.signature}}</view>
-					<view class="more">
-						<image src="../../static/images/common/more.png" mode="aspectFit"></image>
+				<view class="column heads">
+					<view class="row" @tap="modify('昵称','username',userInfo.username,false)">
+						<view class="title">昵称</view>
+						<view class="cont">{{userInfo.username}}</view>
+						<view class="more">
+							<image src="../../static/images/common/more.png" mode="aspectFit"></image>
+						</view>
+					</view>
+					<view class="row">
+						<view class="title">性别</view>
+						<view class="cont">
+							<picker @change="bindPickerChange" :value="userInfo.gender" :range="genderArray">
+								<view class="uni-input">{{genderArray[userInfo.gender]}}</view>
+							</picker>
+						</view>
+						<view class="more">
+							<image src="../../static/images/common/more.png" mode="aspectFit"></image>
+						</view>
+					</view>
+					<view class="row">
+						<view class="title">生日</view>
+						<view class="cont">
+							<picker mode="date" :value="userInfo.birthday" :start="startDate" :end="endDate"
+								@change="bindDateChange" class="picker-box">
+								<view class="uni-input">{{userInfo.birthday}}</view>
+							</picker>
+						</view>
+						<view class="more">
+							<image src="../../static/images/common/more.png" mode="aspectFit"></image>
+						</view>
+					</view>
+					<view class="row" @tap="modify('电话','phone',userInfo.phone,false)">
+						<view class="title">电话</view>
+						<view class="cont">{{userInfo.phone}}</view>
+						<view class="more">
+							<image src="../../static/images/common/more.png" mode="aspectFit"></image>
+						</view>
+					</view>
+					<view class="row" @tap="modify('邮箱','email',userInfo.email,false)">
+						<view class="title">邮箱</view>
+						<view class="cont">{{userInfo.email}}</view>
+						<view class="more">
+							<image src="../../static/images/common/more.png" mode="aspectFit"></image>
+						</view>
 					</view>
 				</view>
-				<view class="row">
-					<view class="title">注册</view>
-					<view class="cont">{{changeTime(userInfo.registration_time)}}</view>
+				<view class="column heads">
+					<view class="row" @tap="modify('修改密码','password',userInfo.password,true)">
+						<view class="title">密码</view>
+						<view class="cont">*******</view>
+						<view class="more">
+							<image src="../../static/images/common/more.png" mode="aspectFit"></image>
+						</view>
+					</view>
 				</view>
+				<view class="bt2" v-if="user_id == userInfo.user_id" @tap="quit">退出登录</view>
+				<view class="bt2" v-if="user_id != userInfo.user_id" @tap="deleteFriend">删除好友</view>
 			</view>
-			<view class="column heads">
-				<view class="row" @tap="modify('昵称','username',userInfo.username,false)">
-					<view class="title">昵称</view>
-					<view class="cont">{{userInfo.username}}</view>
-					<view class="more">
-						<image src="../../static/images/common/more.png" mode="aspectFit"></image>
-					</view>
-				</view>
-				<view class="row">
-					<view class="title">性别</view>
-					<view class="cont">
-						<picker @change="bindPickerChange" :value="userInfo.gender" :range="genderArray">
-							<view class="uni-input">{{genderArray[userInfo.gender]}}</view>
-						</picker>
-					</view>
-					<view class="more">
-						<image src="../../static/images/common/more.png" mode="aspectFit"></image>
-					</view>
-				</view>
-				<view class="row">
-					<view class="title">生日</view>
-					<view class="cont">
-						<picker mode="date" :value="userInfo.birthday" :start="startDate" :end="endDate"
-							@change="bindDateChange" class="picker-box">
-							<view class="uni-input">{{userInfo.birthday}}</view>
-						</picker>
-					</view>
-					<view class="more">
-						<image src="../../static/images/common/more.png" mode="aspectFit"></image>
-					</view>
-				</view>
-				<view class="row" @tap="modify('电话','phone',userInfo.phone,false)">
-					<view class="title">电话</view>
-					<view class="cont">{{userInfo.phone}}</view>
-					<view class="more">
-						<image src="../../static/images/common/more.png" mode="aspectFit"></image>
-					</view>
-				</view>
-				<view class="row" @tap="modify('邮箱','email',userInfo.email,false)">
-					<view class="title">邮箱</view>
-					<view class="cont">{{userInfo.email}}</view>
-					<view class="more">
-						<image src="../../static/images/common/more.png" mode="aspectFit"></image>
-					</view>
-				</view>
-			</view>
-			<view class="column heads">
-				<view class="row" @tap="modify('修改密码','password',userInfo.password,true)">
-					<view class="title">密码</view>
-					<view class="cont">*******</view>
-					<view class="more">
-						<image src="../../static/images/common/more.png" mode="aspectFit"></image>
-					</view>
-				</view>
-			</view>
-			<view class="bt2" v-if="user_id == userInfo.user_id" @tap="quit">退出登录</view>
-			<view class="bt2" v-if="user_id != userInfo.user_id" @tap="deleteFriend">删除好友</view>
 		</view>
 
 		<view class="modify" :animation="animationData" :style="{bottom:-+widHeight + 'px'}">
@@ -338,10 +340,16 @@
 	}
 
 	.main {
-		// padding-top: var(--status-bar-height); // 处理app端顶部自定义tabbar被消息栏遮挡问题
-		padding-top: 100rpx;
+		padding-top: var(--status-bar-height); // 处理app端顶部自定义tabbar被消息栏遮挡问题
+
 		display: flex;
 		flex-direction: column;
+
+		.main-content {
+			display: flex;
+			flex-direction: column;
+			padding-top: 100rpx;
+		}
 
 		.column {
 			display: flex;
