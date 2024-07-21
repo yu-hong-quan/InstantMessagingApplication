@@ -64,10 +64,14 @@
 	import request from '@/request/http';
 	import datas from '../../commons/js/datas.js';
 	import myfun from '../../commons/js/myfun.js';
+	import {
+		connectWebSocket,
+		sendWebSocketMessage
+	} from '@/utils/websocket';
 	export default {
 		data() {
 			return {
-				user_id:'',
+				user_id: '',
 				userInfo: {},
 				friends: [],
 				msgType: '',
@@ -80,12 +84,13 @@
 				title: '加载中...',
 			})
 			this.user_id = uni.getStorageSync('xiaoyuApp_userid');
-			this.token = uni.getStorageSync('xiaoyuApp_token')
+			this.token = uni.getStorageSync('xiaoyuApp_token');
+			// 建立WebSocket连接
+			connectWebSocket();
 			setTimeout(() => {
 				uni.hideLoading()
 				this.getUserInfo()
 			}, 200)
-			
 		},
 		methods: {
 			async getUserInfo() {

@@ -81,6 +81,10 @@ $uni-font-size-paragraph:30rpx;
 	padding-top: var(--status-bar-height) !important; // 处理app端顶部自定义tabbar被消息栏遮挡问题
 }
 
+.uni-popup-message__box{
+	text-align: center;
+}
+
 .ipt-placeholder-style{
 	color:#bbb;
 	font-weight:400;

@@ -108,6 +108,7 @@
 	import myfun from '../../commons/js/myfun.js';
 	import submit from '../../components/submit/submit.vue';
 	const innerAudioContext = uni.createInnerAudioContext();
+	import { sendWebSocketMessage } from '@/utils/websocket';
 	export default {
 		data() {
 			return {
