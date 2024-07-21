@@ -85,8 +85,10 @@
 			})
 			this.user_id = uni.getStorageSync('xiaoyuApp_userid');
 			this.token = uni.getStorageSync('xiaoyuApp_token');
+			
 			// 建立WebSocket连接
 			connectWebSocket();
+			
 			setTimeout(() => {
 				uni.hideLoading()
 				this.getUserInfo()

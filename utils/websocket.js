@@ -3,7 +3,7 @@ let socketTask = null;
 export function connectWebSocket() {
 	console.log(uni.getStorageSync('xiaoyuApp_token'));
 	socketTask = uni.connectSocket({
-		url: 'wss://192.168.31.198:3200/',
+		url: 'wss://192.168.31.198:8080/',
 		header: {
 			'Authorization': `Bearer ${uni.getStorageSync('xiaoyuApp_token')}`, // 在header中添加token
 			'Content-Type': 'application/json'
