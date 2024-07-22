@@ -99,7 +99,13 @@
 			</view>
 			<!-- <view class="padbt"></view> -->
 		</scroll-view>
-		<submit @inputs="inputs" @heights="heights" @inputFocus="inputFocus" @inputBlur="inputBlur" @handleEmojiAndMore="handleEmojiAndMore"></submit>
+		<submit @inputs="inputs" @heights="heights" @inputFocus="inputFocus" @inputBlur="inputBlur"
+			@handleEmojiAndMore="handleEmojiAndMore"></submit>
+
+		<!-- 提示信息弹窗 -->
+		<uni-popup ref="messageTost" type="message">
+			<uni-popup-message :type="msgType" :message="messageText" :duration="2000"></uni-popup-message>
+		</uni-popup>
 	</view>
 </template>
 
@@ -107,16 +113,21 @@
 	import datas from '../../commons/js/datas.js';
 	import myfun from '../../commons/js/myfun.js';
 	import submit from '../../components/submit/submit.vue';
+	import request from '@/request/http';
+	import {
+		sendWebSocketMessage
+	} from '@/utils/websocket';
 	const innerAudioContext = uni.createInnerAudioContext();
-	import { sendWebSocketMessage } from '@/utils/websocket';
 	export default {
 		data() {
 			return {
+				user_id: '',
+				userInfo: {},
 				msgs: [],
 				imgMsg: [],
 				oldTime: new Date(),
 				scrollToView: '',
-				chatMainPBottom:'90',
+				chatMainPBottom: '90',
 				scrollTop: '',
 				animationData: {},
 				nowpage: 0, //页码
@@ -127,19 +138,31 @@
 				fimgUrl: '../../static/images/img/two.png',
 				fid: 'a',
 				type: '1', //0为好友，1为群
-				title: ''
+				title: '',
+				msgType: '',
+				messageText: '',
 			};
 		},
 		components: {
 			submit
 		},
 		onLoad(e) {
+			uni.showLoading({
+				title: '加载中...',
+			})
 			console.log(e)
+			this.user_id = uni.getStorageSync('xiaoyuApp_userid');
+			this.token = uni.getStorageSync('xiaoyuApp_token');
 			this.type = e.type;
 			this.fid = e.fid;
 			this.fimgUrl = e.fimgUrl;
 			this.title = e.title;
-			this.getMsg(this.nowpage)
+
+			setTimeout(() => {
+				uni.hideLoading()
+				this.getUserInfo()
+			}, 200)
+
 			// this.nextPage()
 		},
 		methods: {
@@ -165,6 +188,30 @@
 				uni.navigateTo({
 					url: '../grouphome/grouphome?gid=' + this.fid + '&gimg=' + this.fimgUrl
 				})
+			},
+			async getUserInfo() {
+				try {
+					const res = await request('/getUserInfo', 'POST', {
+						user_id: this.user_id
+					})
+					if (res.code === 200) {
+						this.userInfo = res.userInfo;
+						uni.setStorageSync('userInfo', JSON.stringify(res.userInfo));
+						this.getMsg(this.nowpage)
+						
+					} else if (res.code === 401) {
+						this.messageToggle('error', res.error)
+						uni.removeStorageSync('xiaoyuApp_token');
+						uni.removeStorageSync('xiaoyuApp_userid');
+						setTimeout(() => {
+							uni.navigateTo({
+								url: `/pages/signin/signin`
+							})
+						}, 1500)
+					}
+				} catch (error) {
+					console.log(error);
+				}
 			},
 			// 获取聊天数据
 			getMsg(page) {
@@ -206,6 +253,13 @@
 				this.isloading = true;
 				// 恢复加载控制
 				this.beginloading = true;
+
+				sendWebSocketMessage({
+					send_user_id: this.user_id,
+					receiver_user_id: 928813,
+					send_content: '测试发送',
+					content_type: 0,
+				});
 			},
 			// 预览图片
 			perviewImg(e) {
@@ -298,20 +352,20 @@
 				this.goBottom()
 			},
 			// 输入框失去焦点监听
-			inputBlur(){
+			inputBlur() {
 				this.chatMainPBottom = 90;
 				this.goBottom()
 			},
 			// 表情窗/更多功能的显示/隐藏
-			handleEmojiAndMore(val){
-				if(!val){
+			handleEmojiAndMore(val) {
+				if (!val) {
 					this.chatMainPBottom = 300;
-				}else{
+				} else {
 					this.chatMainPBottom = 90;
 				}
 				this.goBottom();
 			},
-			handleChatMain(){
+			handleChatMain() {
 				// this.goBottom();
 			},
 			// 滚动到底部
@@ -345,6 +399,12 @@
 						}
 					}.bind(this), 20)
 				}
+			},
+			// tost消息窗
+			messageToggle(type, text) {
+				this.msgType = type
+				this.messageText = text
+				this.$refs.messageTost.open()
 			},
 		}
 	}

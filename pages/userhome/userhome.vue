@@ -20,7 +20,9 @@
 		<view class="main">
 			<view class="user-header">
 				<view class="sex" :style="{background:user.gender == 0 ? sexBg : bolBg}" :animation="animationData4">
-					<image :src="user.gender == 0 ? '../../static/images/userhome/female.png' : '../../static/images/userhome/male.png'" mode="">
+					<image
+						:src="user.gender == 0 ? '../../static/images/userhome/female.png' : '../../static/images/userhome/male.png'"
+						mode="">
 					</image>
 				</view>
 				<image :src="user.avatar" mode="aspectFill" class="user-img" :animation="animationData3"></image>
@@ -31,7 +33,7 @@
 				<view class="intr">{{user.signature}}</view>
 			</view>
 		</view>
-		<view class="bottom-bar" v-show="user_id != user.user_id">
+		<view class="bottom-bar" v-if="first_id != user_id">
 			<view class="bottom-btn btn1" @tap="addFriendAnimat">加为好友</view>
 		</view>
 
@@ -43,16 +45,23 @@
 			<view class="close btn1 " @tap="addFriendAnimat">取消</view>
 			<view class="send btn1">发送</view>
 		</view>
+
+		<!-- 提示信息弹窗 -->
+		<uni-popup ref="messageTost" type="message">
+			<uni-popup-message :type="msgType" :message="messageText" :duration="2000"></uni-popup-message>
+		</uni-popup>
 	</view>
 </template>
 
 <script>
+	import request from '@/request/http';
 	export default {
 		data() {
 			return {
-				user_id: '', //好友id
+				user_id: '',
+				first_id:'',
 				sexBg: 'rgba(255,93,91,1)',
-				bolBg:'rgba(17, 180, 255, 1.0)',
+				bolBg: 'rgba(17, 180, 255, 1.0)',
 				myname: '春雨',
 				user: {},
 				addHeight: '',
@@ -62,14 +71,20 @@
 				animationData4: {},
 				animationData5: {},
 				isAdd: false,
+				msgType:'',
+				messageText:''
 			};
 		},
 		onReady() {
 			this.getElementStyle();
 		},
 		onLoad(options) {
-			this.user = wx.getStorageSync('userInfo') ? JSON.parse(wx.getStorageSync('userInfo')) : '';
-			this.user_id = options.user_id;
+			uni.showLoading({
+				title: '加载中...',
+			})
+			this.user_id = uni.getStorageSync('xiaoyuApp_userid');
+			this.first_id = options.user_id;
+			this.getUserInfo()
 		},
 		methods: {
 			// 返回至上一页
@@ -81,7 +96,7 @@
 			// 跳转个人详情页
 			goUserDetails() {
 				uni.navigateTo({
-					url: `../userdetails/userdetails?user_id=${this.user_id}`
+					url: `../userdetails/userdetails?user_id=${this.first_id}`
 				})
 			},
 			// 获取元素位置等信息
@@ -92,6 +107,31 @@
 					console.log("节点离页面顶部的距离为" + data.top);
 					this.addHeight = data.height - 186;
 				}).exec();
+			},
+			async getUserInfo() {
+				try {
+					const res = await request('/getUserInfo', 'POST', {
+						user_id: this.first_id
+					})
+					console.log(res);
+					if (res.code === 200) {
+						this.user = res.userInfo;
+						uni.hideLoading();
+					} else if (res.code === 401) {
+						uni.hideLoading();
+						this.messageToggle('error', res.error)
+						uni.removeStorageSync('xiaoyuApp_token');
+						uni.removeStorageSync('xiaoyuApp_userid');
+						setTimeout(() => {
+							uni.navigateTo({
+								url: `/pages/signin/signin`
+							})
+						}, 1500)
+
+					}
+				} catch (error) {
+					console.log(error);
+				}
 			},
 			// 添加好友动画
 			addFriendAnimat() {
@@ -139,7 +179,13 @@
 				this.animationData3 = animation3.export();
 				this.animationData4 = animation4.export();
 				this.animationData5 = animation5.export();
-			}
+			},
+			// tost消息窗
+			messageToggle(type, text) {
+				this.msgType = type
+				this.messageText = text
+				this.$refs.messageTost.open()
+			},
 		}
 	}
 </script>

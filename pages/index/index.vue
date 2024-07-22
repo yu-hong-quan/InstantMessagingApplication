@@ -65,8 +65,7 @@
 	import datas from '../../commons/js/datas.js';
 	import myfun from '../../commons/js/myfun.js';
 	import {
-		connectWebSocket,
-		sendWebSocketMessage
+		connectWebSocket
 	} from '@/utils/websocket';
 	export default {
 		data() {
@@ -85,10 +84,8 @@
 			})
 			this.user_id = uni.getStorageSync('xiaoyuApp_userid');
 			this.token = uni.getStorageSync('xiaoyuApp_token');
-			
 			// 建立WebSocket连接
 			connectWebSocket();
-			
 			setTimeout(() => {
 				uni.hideLoading()
 				this.getUserInfo()
@@ -104,7 +101,6 @@
 					if (res.code === 200) {
 						this.userInfo = res.userInfo;
 						uni.setStorageSync('userInfo', JSON.stringify(res.userInfo));
-						console.log(this.userInfo);
 						this.getFrinds();
 					} else if (res.code === 401) {
 						this.messageToggle('error', res.error)

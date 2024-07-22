@@ -1,9 +1,8 @@
 let socketTask = null;
 
 export function connectWebSocket() {
-	console.log(uni.getStorageSync('xiaoyuApp_token'));
 	socketTask = uni.connectSocket({
-		url: 'wss://192.168.31.198:8080/',
+		url: 'ws://192.168.31.198:3200/', //本地开发环境用ws  生产用wss
 		header: {
 			'Authorization': `Bearer ${uni.getStorageSync('xiaoyuApp_token')}`, // 在header中添加token
 			'Content-Type': 'application/json'
@@ -11,7 +10,7 @@ export function connectWebSocket() {
 	});
 
 	uni.onSocketOpen((res) => {
-		console.log('WebSocket连接已打开');
+		console.log('WebSocket连接成功');
 		socketTask = true;
 	});
 
@@ -22,6 +21,12 @@ export function connectWebSocket() {
 	uni.onSocketClose((res) => {
 		console.log('WebSocket连接已关闭');
 		socketTask = false;
+	});
+
+	// 处理接收到的消息
+	uni.onSocketMessage((event) => {
+		console.log(event);
+		// const data = JSON.parse(event.data);
 	});
 }
 

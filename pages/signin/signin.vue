@@ -31,9 +31,6 @@
 </template>
 
 <script>
-	import {
-		debounce
-	} from '../../utils/index.js';
 	import request from '@/request/http';
 	export default {
 		data() {

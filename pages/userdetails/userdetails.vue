@@ -23,21 +23,21 @@
 							<view class="user-img">
 								<image :src="userInfo.avatar" class="avatar-img">
 								</image>
-								<image src="../../static/images/group/change.png" v-show="user_id == userInfo.user_id"
+								<image src="../../static/images/group/change.png" v-show="user_id == first_id"
 									class="pan" @tap="upload"></image>
 							</view>
 							<canvas id="myCanvas" canvas-id="myCanvas" class="meslist_canvas" crop-width="200"
 								crop-height="200"></canvas>
 						</view>
-						<view class="more" v-show="user_id == userInfo.user_id">
+						<view class="more" v-show="user_id == first_id">
 							<image src="../../static/images/common/more.png" mode="aspectFit"></image>
 						</view>
 					</view>
 					<view class="row"
-						@tap="user_id == userInfo.user_id ? modify('签名','signature',userInfo.signature,false) : ''">
+						@tap="user_id == first_id ? modify('签名','signature',userInfo.signature,false) : ''">
 						<view class="title">签名</view>
 						<view class="cont">{{userInfo.signature}}</view>
-						<view class="more" v-show="user_id == userInfo.user_id">
+						<view class="more" v-show="user_id == first_id">
 							<image src="../../static/images/common/more.png" mode="aspectFit"></image>
 						</view>
 					</view>
@@ -48,10 +48,10 @@
 				</view>
 				<view class="column heads">
 					<view class="row"
-						@tap="user_id == userInfo.user_id ? modify('昵称','username',userInfo.username,false) : ''">
+						@tap="user_id == first_id ? modify('昵称','username',userInfo.username,false) : ''">
 						<view class="title">昵称</view>
 						<view class="cont">{{userInfo.username}}</view>
-						<view class="more" v-show="user_id == userInfo.user_id">
+						<view class="more" v-show="user_id == first_id">
 							<image src="../../static/images/common/more.png" mode="aspectFit"></image>
 						</view>
 					</view>
@@ -59,12 +59,12 @@
 						<view class="title">性别</view>
 						<view class="cont">
 							<picker @change="handleGenderPickerChange" :value="userInfo.gender" :range="genderArray"
-								v-if="user_id == userInfo.user_id">
+								v-if="user_id == first_id">
 								<view class="uni-input">{{genderArray[userInfo.gender]}}</view>
 							</picker>
 							<view class="uni-input" v-else>{{genderArray[userInfo.gender]}}</view>
 						</view>
-						<view class="more" v-show="user_id == userInfo.user_id">
+						<view class="more" v-show="user_id == first_id">
 							<image src="../../static/images/common/more.png" mode="aspectFit"></image>
 						</view>
 					</view>
@@ -72,33 +72,33 @@
 						<view class="title">生日</view>
 						<view class="cont">
 							<picker mode="date" :value="userInfo.birthday" :start="startDate" :end="endDate"
-								@change="bindDateChange" class="picker-box" v-if="user_id == userInfo.user_id">
+								@change="bindDateChange" class="picker-box" v-if="user_id == first_id">
 								<view class="uni-input">{{userInfo.birthday}}</view>
 							</picker>
 							<view class="uni-input" v-else>{{userInfo.birthday}}</view>
 						</view>
-						<view class="more" v-show="user_id == userInfo.user_id">
+						<view class="more" v-show="user_id == first_id">
 							<image src="../../static/images/common/more.png" mode="aspectFit"></image>
 						</view>
 					</view>
 					<view class="row"
-						@tap="user_id == userInfo.user_id ? modify('电话','phone',userInfo.phone,false) : ''">
+						@tap="user_id == first_id ? modify('电话','phone',userInfo.phone,false) : ''">
 						<view class="title">电话</view>
 						<view class="cont">{{userInfo.phone}}</view>
-						<view class="more" v-show="user_id == userInfo.user_id">
+						<view class="more" v-show="user_id == first_id">
 							<image src="../../static/images/common/more.png" mode="aspectFit"></image>
 						</view>
 					</view>
 					<view class="row"
-						@tap="user_id == userInfo.user_id ? modify('邮箱','email',userInfo.email,false) : ''">
+						@tap="user_id == first_id ? modify('邮箱','email',userInfo.email,false) : ''">
 						<view class="title">邮箱</view>
 						<view class="cont">{{userInfo.email}}</view>
-						<view class="more" v-show="user_id == userInfo.user_id">
+						<view class="more" v-show="user_id == first_id">
 							<image src="../../static/images/common/more.png" mode="aspectFit"></image>
 						</view>
 					</view>
 				</view>
-				<view class="column heads" v-show="user_id == userInfo.user_id">
+				<view class="column heads" v-show="user_id == first_id">
 					<view class="row" @tap="modify('修改密码','password',userInfo.password,true)">
 						<view class="title">密码</view>
 						<view class="cont">*******</view>
@@ -107,8 +107,8 @@
 						</view>
 					</view>
 				</view>
-				<view class="bt2" v-show="user_id == userInfo.user_id" @tap="quit">退出登录</view>
-				<view class="bt2" v-show="user_id != userInfo.user_id" @tap="deleteFriend">删除好友</view>
+				<view class="bt2" v-show="user_id == first_id" @tap="quit">退出登录</view>
+				<view class="bt2" v-show="user_id != first_id" @tap="deleteFriend">删除好友</view>
 			</view>
 		</view>
 
@@ -169,11 +169,13 @@
 				format: true
 			})
 			return {
-				userInfo: null,
+				user_id: '',
+				first_id:'',
+				userInfo: {},
 				tempFilePath: '',
 				imgurl: '',
 				genderArray: ['女', '男'],
-				dataText: '修改的内容',
+				dataText: '',
 				password: '',
 				newPassword: '',
 				modifyTitle: '',
@@ -181,7 +183,6 @@
 				isModfiy: false, //动画开关
 				widHeight: '',
 				ispwd: false,
-				user_id: '',
 				titleKey: '',
 				messageText: '',
 				msgType: '',
@@ -202,8 +203,12 @@
 			this.getElementStyle();
 		},
 		onLoad(options) {
-			this.user_id = options.user_id;
-			this.userInfo = uni.getStorageSync('userInfo') ? JSON.parse(uni.getStorageSync('userInfo')) : null;
+			uni.showLoading({
+				title: '加载中...',
+			})
+			this.user_id = uni.getStorageSync('xiaoyuApp_userid');
+			this.first_id = options.user_id;
+			this.getUserInfo()
 		},
 		methods: {
 			// 获取元素位置等信息
@@ -220,6 +225,31 @@
 				uni.navigateBack({
 					data: 1
 				})
+			},
+			async getUserInfo() {
+				try {
+					const res = await request('/getUserInfo', 'POST', {
+						user_id: this.first_id
+					})
+					console.log(res);
+					if (res.code === 200) {
+						this.userInfo = res.userInfo;
+						uni.hideLoading();
+					} else if (res.code === 401) {
+						uni.hideLoading();
+						this.messageToggle('error', res.error)
+						uni.removeStorageSync('xiaoyuApp_token');
+						uni.removeStorageSync('xiaoyuApp_userid');
+						setTimeout(() => {
+							uni.navigateTo({
+								url: `/pages/signin/signin`
+							})
+						}, 1500)
+			
+					}
+				} catch (error) {
+					console.log(error);
+				}
 			},
 			changeTime(date) {
 				return myfun.detailTime(date);

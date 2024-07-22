@@ -16,15 +16,17 @@
 			<view class="search-user result">
 				<view class="title" v-show="userarr.length>0">用户</view>
 				<view class="list user" v-for="(item,index) in userarr" :key="item.id">
-					<navigator url="../userhome/userhome?id=aaa" hover-class="none">
-						<image :src="item.imgurl" mode=""></image>
+					<navigator :url="'../userhome/userhome?user_id=' + item.user_id" hover-class="none">
+						<image :src="item.avatar" mode=""></image>
 					</navigator>
 					<view class="names">
-						<view class="name" v-html="item.name"></view>
+						<view class="name" v-html="item.username"></view>
 						<view class="email" v-html="item.email"></view>
 					</view>
-					<view class="right-bt send" v-show="item.tip == 1" @tap="send">发消息</view>
-					<view class="right-bt add" v-show="item.tip != 1" @tap="addFriend">加好友</view>
+					<template v-if="item.user_id != user_id">
+						<view class="right-bt send" v-show="item.tip == 1" @tap="send">发消息</view>
+						<view class="right-bt add" v-show="item.tip != 1" @tap="addFriend(item.user_id)">加好友</view>
+					</template>
 				</view>
 			</view>
 		</view>
@@ -33,17 +35,39 @@
 
 <script>
 	import datas from '../../commons/js/datas.js';
+	import request from '@/request/http';
+	import {
+		debounce
+	} from '@/utils/index.js';
 	export default {
 		data() {
 			return {
+				user_id: '',
 				userarr: []
 			};
 		},
+		onLoad() {
+			this.user_id = uni.getStorageSync('xiaoyuApp_userid');
+		},
 		methods: {
+			async getUserList(keyword) {
+				try {
+					const res = await request('/searchUsers', 'POST', {
+						keyword,
+						user_id: this.user_id
+					})
+					console.log(res);
+					if (res.code === 200) {
+						this.searchUser(res.data, keyword)
+					} else if (res.code === 401) {}
+				} catch (error) {
+					console.log(error);
+				}
+			},
 			// 点击加好友按钮
-			addFriend() {
+			addFriend(user_id) {
 				uni.navigateTo({
-					url: '../userhome/userhome'
+					url: `../userhome/userhome?user_id=${user_id}`
 				})
 			},
 			// 点击发送消息按钮
@@ -52,26 +76,26 @@
 					url: '../chatroom/chatroom'
 				})
 			},
-			search(e) {
+			search: debounce(function(e) {
 				this.userarr = [];
 				let searchval = e.detail.value;
-				if (searchval.length > 0) {
-					this.searchUser(searchval)
+				if (searchval.trim().length > 0) {
+					this.getUserList(searchval);
 				}
-			},
+			}, 200),
 			// 寻找关键词匹配的好友
-			searchUser(e) {
-				let arr = datas.friends();
+			searchUser(datas, e) {
+				// let arr = datas.friends();
+
 				let exp = eval(`/${e}/g`); //定义全局搜索关键词正则
-				for (let i = 0; i < arr.length; i++) {
+				for (let i = 0; i < datas.length; i++) {
 					// 判断输入的关键词是否在好友列表中存在（好友名称或者邮箱）
-					if (arr[i].name.search(e) != -1 || arr[i].email.search(e) != -1) {
-						this.isFriend(arr[i])
-						arr[i].imgurl = '../../static/images/img/' + arr[i].imgurl;
+					if (datas[i].username.search(e) != -1 || datas[i].email.search(e) != -1) {
+						this.isFriend(datas[i])
 						// 替换查询到的关键词为特定样式html文本使其高亮
-						arr[i].name = arr[i].name.replace(exp, `<span style='color:#4AAAFF;'>${e}</span>`)
-						arr[i].email = arr[i].email.replace(exp, `<span style='color:#4AAAFF;'>${e}</span>`)
-						this.userarr.push(arr[i]);
+						datas[i].username = datas[i].username.replace(exp, `<span style='color:#4AAAFF;'>${e}</span>`)
+						datas[i].email = datas[i].email.replace(exp, `<span style='color:#4AAAFF;'>${e}</span>`)
+						this.userarr.push(datas[i]);
 					}
 				}
 				console.log(this.userarr)
@@ -112,10 +136,11 @@
 		.top-bar-contaner {
 			display: flex;
 			align-items: center;
+
 			.search-div {
 				width: 100%;
 				height: 100%;
-				padding-left:  $uni-spacing-col-base;
+				padding-left: $uni-spacing-col-base;
 				box-sizing: border-box;
 				display: flex;
 				align-items: center;
@@ -139,9 +164,7 @@
 				}
 			}
 
-			.top-bar-right {
-				
-			}
+			.top-bar-right {}
 		}
 
 	}
